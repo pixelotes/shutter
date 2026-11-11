@@ -1,4 +1,4 @@
-"""Read-only discovery. Builds the list of items persiana would act on (also used in dry-run)."""
+"""Read-only discovery. Builds the list of items shutter would act on (also used in dry-run)."""
 from __future__ import annotations
 
 import re
@@ -85,57 +85,150 @@ def last_sign_in(graph: Client, app_id: str) -> str | None:
 
 
 # --------------------------------------------------------------------------- conditional access
-def conditional_access(graph: Client, cfg: dict) -> dict:
-    pid = cfg["conditional_access"]["policy_id"]
+def _ca_item(graph: Client, pid: str, target_users, action: str, reasons: list[str],
+             category: str = "conditional-access") -> dict:
     pol = strip_odata(graph.get(f"/v1.0/identity/conditionalAccess/policies/{pid}"))
     users = pol["conditions"]["users"]
-    target_users = dict(users)
-    target_users["includeGuestsOrExternalUsers"] = {
-        "guestOrExternalUserTypes": ALL_EXTERNAL_TYPES,
-        "externalTenants": {"@odata.type": "#microsoft.graph.conditionalAccessAllExternalTenants",
-                            "membershipKind": "all"},
-    }
     excluded = resolve_principals(graph, set(users.get("excludeUsers", [])))
-    scope = ((users.get("includeGuestsOrExternalUsers") or {}).get("externalTenants") or {})
-    already = pol["state"] == "enabled" and scope.get("membershipKind") == "all"
+    after = {"state": "enabled", "conditions": {**pol["conditions"], "users": target_users(users)}}
+    already = pol["state"] == "enabled" and pol["conditions"]["users"] == after["conditions"]["users"]
     it = _item(
-        "conditional-access", pid, pol["displayName"],
-        action="noop" if already else "widen-to-all-external-tenants",
-        severity="critical",
-        reasons=["Block sign-in for every guest / external user (all external tenants)"],
+        category, pid, pol["displayName"], action="noop" if already else action, severity="critical",
+        reasons=reasons,
         details={
+            "policyId": pid,
             "currentState": pol["state"],
-            "currentExternalTenants": scope,
+            "currentExternalTenants": ((users.get("includeGuestsOrExternalUsers") or {}).get("externalTenants") or {}),
             "excludedUsers": [excluded.get(u, {"id": u}) for u in users.get("excludeUsers", [])],
             "excludedGroups": users.get("excludeGroups", []),
             "grantControls": pol.get("grantControls"),
             "modifiedDateTime": pol.get("modifiedDateTime"),
         },
-        before={"state": pol["state"], "conditions": pol["conditions"]},
-        after={"state": "enabled", "conditions": {**pol["conditions"], "users": target_users}},
+        before={"state": pol["state"], "conditions": pol["conditions"]}, after=after,
     )
     if already:
         it["status"] = "skipped"
-        it["reasons"].append("Policy already enabled for all external tenants")
+        it["reasons"].append("Policy already enabled with this scope")
     return it
 
 
-# --------------------------------------------------------------------------- SFTP
-def sftp_accounts(arm: Client, graph: Client) -> list[dict]:
+def resolve_domain_tenants(graph: Client, domains: list[str]) -> tuple[dict[str, str], list[str]]:
+    """domain -> Entra tenant ID; domains with no Entra tenant are returned separately."""
+    found, missing = {}, []
+    for d in domains:
+        try:
+            info = graph.get(f"/v1.0/tenantRelationships/findTenantInformationByDomainName(domainName='{d}')")
+            found[d] = info["tenantId"]
+        except ApiError:
+            missing.append(d)
+    return found, missing
+
+
+def guest_items(graph: Client, cfg: dict, domains: list[str] | None) -> list[dict]:
+    """Block all guests, or only guests from `domains`, with the configured CA policy.
+
+    Domains backed by an Entra tenant are targeted by tenant ID. Guests from other domains (personal
+    Microsoft accounts, email one-time passcode) are added to a static group that the policy includes.
+    """
+    pid = cfg["conditional_access"]["policy_id"]
+    if not domains:
+        def target(users):
+            t = dict(users)
+            t["includeGuestsOrExternalUsers"] = {
+                "guestOrExternalUserTypes": ALL_EXTERNAL_TYPES,
+                "externalTenants": {"@odata.type": "#microsoft.graph.conditionalAccessAllExternalTenants",
+                                    "membershipKind": "all"}}
+            return t
+        return [_ca_item(graph, pid, target, "block-all-guests",
+                         ["Block sign-in for every guest / external user (all external tenants)"])]
+
+    tenants, no_tenant = resolve_domain_tenants(graph, domains)
+    group_id = cfg["conditional_access"].get("static_group_id")
+    items: list[dict] = []
+    guests = []
+    if no_tenant:
+        if not group_id:
+            raise ValueError(f"domains without an Entra tenant ({', '.join(no_tenant)}) need "
+                             "conditional_access.static_group_id in shutter.toml")
+        allg = graph.get_all("/v1.0/users?$filter=userType eq 'Guest'&$select=id,displayName,mail,userPrincipalName,otherMails&$top=999")
+        suffixes = tuple(f"@{d.lower()}" for d in no_tenant)
+        guests = [g for g in allg if any((m or "").lower().endswith(suffixes) for m in [g.get("mail")] + (g.get("otherMails") or []))]
+
+    def target(users):
+        t = dict(users)
+        if tenants:
+            t["includeGuestsOrExternalUsers"] = {
+                "guestOrExternalUserTypes": ALL_EXTERNAL_TYPES,
+                "externalTenants": {"@odata.type": "#microsoft.graph.conditionalAccessEnumeratedExternalTenants",
+                                    "membershipKind": "enumerated", "members": sorted(tenants.values())}}
+        if group_id and no_tenant:
+            t["includeGroups"] = sorted(set(t.get("includeGroups") or []) | {group_id})
+        return t
+    reasons = [f"Block guests from {d} (tenant {t})" for d, t in tenants.items()]
+    reasons += [f"Block guests from {d} via static group ({sum(1 for g in guests if any((m or '').lower().endswith('@' + d.lower()) for m in [g.get('mail')] + (g.get('otherMails') or [])))} matched)" for d in no_tenant]
+    items.append(_ca_item(graph, pid, target, "block-guests-by-domain", reasons))
+    if guests:
+        items.append(group_members_item(graph, group_id, add=[g["id"] for g in guests],
+                                        reason=f"Guests from {', '.join(no_tenant)} (no Entra tenant)"))
+    return items
+
+
+def group_members_item(graph: Client, group_id: str, add: list[str] | None = None,
+                       remove_all_except: set[str] | None = None, reason: str = "") -> dict:
+    """Desired membership of a group. Revert restores the exact previous member list."""
+    g = graph.get(f"/v1.0/groups/{group_id}?$select=id,displayName,onPremisesSyncEnabled,membershipRule,isAssignableToRole")
+    members = graph.get_all(f"/v1.0/groups/{group_id}/members?$select=id,displayName,userPrincipalName&$top=999")
+    current = sorted(m["id"] for m in members)
+    if add is not None:
+        target = sorted(set(current) | set(add))
+        action = "add-members"
+    else:
+        target = sorted(m for m in current if m in (remove_all_except or set()))
+        action = "remove-members"
+    it = _item("group-members", group_id, g["displayName"], action=action,
+               severity="critical" if g.get("isAssignableToRole") else "high", reasons=[reason] if reason else [],
+               details={"members": [{"id": m["id"], "displayName": m.get("displayName"), "upn": m.get("userPrincipalName")} for m in members],
+                        "adding": sorted(set(target) - set(current)), "removing": sorted(set(current) - set(target)),
+                        "roleAssignable": bool(g.get("isAssignableToRole"))},
+               before={"members": current}, after={"members": target})
+    if g.get("onPremisesSyncEnabled") or g.get("membershipRule"):
+        it.update(status="report-only", action="report-only")
+        it["reasons"].append("Synced or dynamic group: membership cannot be changed here — use --disable-groups (CA block)")
+    elif current == target:
+        it.update(status="skipped", action="noop")
+        it["reasons"].append("Membership already in target state")
+    return it
+
+
+# --------------------------------------------------------------------------- storage
+def storage_items(arm: Client, graph: Client, mode: str, names: list[str] | None) -> list[dict]:
+    """mode: sftp | public | both. Without names: every account that is not already contained."""
     rows = arm.resource_graph("""
 resources
 | where type =~ 'microsoft.storage/storageaccounts'
-| where tobool(properties.isSftpEnabled) == true
 | join kind=leftouter (resourcecontainers
     | where type =~ 'microsoft.resources/subscriptions'
     | project subscriptionId, subscriptionName = name) on subscriptionId
 | project id, name, resourceGroup, subscriptionId, subscriptionName, location, tags,
+          isSftpEnabled = tobool(properties.isSftpEnabled),
           isLocalUserEnabled = tobool(properties.isLocalUserEnabled),
           publicNetworkAccess = tostring(properties.publicNetworkAccess)
 """)
-    if not rows:
+    if names:
+        rows = select_resources(rows, names, "storage account")
+    want_sftp, want_public = mode in ("sftp", "both"), mode in ("public", "both")
+    picked = []
+    for r in rows:
+        before, after = {}, {}
+        if want_sftp and r.get("isSftpEnabled"):
+            before["isSftpEnabled"], after["isSftpEnabled"] = True, False
+        if want_public and (r.get("publicNetworkAccess") or "Enabled") != "Disabled":
+            before["publicNetworkAccess"], after["publicNetworkAccess"] = r.get("publicNetworkAccess") or "Enabled", "Disabled"
+        if after or names:
+            picked.append((r, before, after))
+    if not picked:
         return []
-    ids = ",".join(f"'{r['id'].lower()}'" for r in rows)
+    ids = ",".join(f"'{r['id'].lower()}'" for r, _, _ in picked)
     owners_rows = arm.resource_graph(f"""
 authorizationresources
 | where type =~ 'microsoft.authorization/roleassignments'
@@ -146,7 +239,7 @@ authorizationresources
 """)
     principals = resolve_principals(graph, {o["principalId"] for o in owners_rows})
     items = []
-    for r in rows:
+    for r, before, after in picked:
         tags = r.get("tags") or {}
         owners = [principals.get(o["principalId"], {"id": o["principalId"]})
                   for o in owners_rows if o["scope"] == r["id"].lower()]
@@ -154,20 +247,44 @@ authorizationresources
             if k in tags:
                 owners.append({"displayName": tags[k], "type": f"tag:{k}"})
         local_users = []
-        try:
-            lu = arm.get(f"{r['id']}/localUsers?api-version={STORAGE_API}")
-            local_users = [u["name"] for u in lu.get("value", [])]
-        except ApiError:
-            pass
-        items.append(_item(
-            "sftp", r["id"], r["name"], action="disable-sftp", severity="high", owners=owners,
-            reasons=["SFTP endpoint enabled on storage account"],
-            details={k: r.get(k) for k in ("subscriptionName", "subscriptionId", "resourceGroup",
-                                           "location", "isLocalUserEnabled", "publicNetworkAccess")}
+        if r.get("isSftpEnabled"):
+            try:
+                lu = arm.get(f"{r['id']}/localUsers?api-version={STORAGE_API}")
+                local_users = [u["name"] for u in lu.get("value", [])]
+            except ApiError:
+                pass
+        reasons = []
+        if "isSftpEnabled" in after:
+            reasons.append("SFTP endpoint enabled")
+        if "publicNetworkAccess" in after:
+            reasons.append(f"Public network access: {before['publicNetworkAccess']}")
+        it = _item(
+            "storage", r["id"], r["name"],
+            action="+".join(a for a, k in (("disable-sftp", "isSftpEnabled"), ("disable-public-access", "publicNetworkAccess")) if k in after) or "noop",
+            severity="high", owners=owners, reasons=reasons,
+            details={k: r.get(k) for k in ("subscriptionName", "subscriptionId", "resourceGroup", "location",
+                                           "isSftpEnabled", "isLocalUserEnabled", "publicNetworkAccess")}
                     | {"localUsers": local_users, "tags": tags},
-            before={"isSftpEnabled": True}, after={"isSftpEnabled": False},
-        ))
+            before=before or None, after=after or None,
+        )
+        if not after:
+            it["status"] = "skipped"
+            it["reasons"].append("Already contained")
+        items.append(it)
     return items
+
+
+def select_resources(rows: list[dict], names: list[str], kind: str) -> list[dict]:
+    """Pick rows by full resource ID or by (unique) name. Unknown or ambiguous names abort the run."""
+    out = []
+    for n in names:
+        hits = [r for r in rows if r["id"].lower() == n.lower()] or [r for r in rows if r["name"].lower() == n.lower()]
+        if not hits:
+            raise ValueError(f"{kind} {n!r} not found")
+        if len(hits) > 1:
+            raise ValueError(f"{kind} name {n!r} is ambiguous ({len(hits)} matches) — use the full resource ID")
+        out.append(hits[0])
+    return out
 
 
 # --------------------------------------------------------------------------- service principals
@@ -297,9 +414,9 @@ authorizationresources
         if sp.get("appOwnerOrganizationId") in allow["owner_tenant_ids"]:
             why = "Microsoft first-party application"
         elif sp["appId"] in allow["app_ids"] or sp_id in allow["service_principal_ids"]:
-            why = "In persiana.toml allowlist"
+            why = "In shutter.toml allowlist"
         elif caller_app_id and sp["appId"] == caller_app_id:
-            why = "Identity running persiana"
+            why = "Identity running shutter"
         elif sp.get("servicePrincipalType") == "ManagedIdentity":
             it["action"] = "report-only"
             it["reasons"].append("Managed identity: cannot be disabled via Graph — remove its role "
@@ -376,7 +493,7 @@ def app_registrations(graph: Client, cfg: dict, ctx: dict, sp_items: list[dict])
         )
         if app["appId"] in allow["app_ids"]:
             it.update(status="skipped-allowlist", action="none")
-            it["reasons"].append("In persiana.toml allowlist")
+            it["reasons"].append("In shutter.toml allowlist")
         elif app["appId"] in covered:
             it.update(status="covered", action="see-service-principal")
             it["details"]["coveredBy"] = covered[app["appId"]]["key"]

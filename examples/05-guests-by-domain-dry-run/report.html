@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Persiana Report</title>
+<title>SHUTTER Report</title>
 <style>
 :root{
   --bg:#f6f7f9;--panel:#fff;--ink:#16191f;--muted:#5d6675;--line:#e3e6eb;--chip:#eef0f4;
@@ -61,7 +61,9 @@ input[type=search]{flex:1;min-width:180px}
 .sev-low{background:var(--gray-bg);color:var(--muted)}
 .st-applied,.st-reverted{background:var(--ok-bg);color:var(--ok)}
 .st-planned{background:var(--info-bg);color:var(--info)}
-.st-failed,.st-drift{background:var(--crit-bg);color:var(--crit)}
+.st-failed,.st-drift,.st-in-progress{background:var(--crit-bg);color:var(--crit)}
+.st-irreversible{background:var(--high-bg);color:var(--high)}
+.irrev{display:inline-block;margin-left:6px;border-radius:999px;padding:1px 7px;font-size:11px;font-weight:700;background:var(--crit-bg);color:var(--crit)}
 .st-skipped,.st-skipped-allowlist,.st-covered,.st-report-only,.st-not-applicable{background:var(--gray-bg);color:var(--muted)}
 .body{padding:4px 16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .body h4{margin:8px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
@@ -89,13 +91,288 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
 </head>
 <body>
 <div class="wrap" id="app"></div>
-<script id="report-data" type="application/json">/*__REPORT_JSON__*/null</script>
+<script id="report-data" type="application/json">{
+  "schema": 2,
+  "tool": {
+    "name": "shutter",
+    "version": "0.1.0"
+  },
+  "run": {
+    "id": "346c7582-af50-44fa-9dee-177c81a61b21",
+    "mode": "dry-run",
+    "status": "completed",
+    "startedAt": "2026-11-11T15:39:47+00:00",
+    "finishedAt": "2026-11-11T15:39:47+00:00",
+    "operator": {
+      "kind": "user",
+      "id": "00000006-c0de-4c0d-9e00-000000000006",
+      "upn": "alexw@contoso.com",
+      "appId": null
+    },
+    "tenantId": "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
+    "configSha256": "9939ce813c995638ddb04fd8901dea3723d6a511d0daa07c3ac6c60f70e0cc2f",
+    "selection": {
+      "disable_guests": [
+        "acme.com",
+        "fabrikam.com",
+        "acme-partners.io",
+        "gmail.com"
+      ],
+      "disable_groups": null,
+      "remove_group_members": null,
+      "disable_enterprise_apps": null,
+      "disable_app_registrations": null,
+      "disable_users": null,
+      "revoke_sessions": null,
+      "disable_storage": null,
+      "disable_keyvault_public_access": null,
+      "disable_aks": null,
+      "lock_resource_groups": null,
+      "disable_guest_invites": false,
+      "disable_user_consent": false,
+      "storage_mode": "both",
+      "aks_mode": "stop",
+      "exclude": []
+    }
+  },
+  "preflight": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "Tenant matches shutter.toml",
+        "ok": true,
+        "detail": "token tid=8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f config=8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
+        "blocking": true
+      },
+      {
+        "name": "Graph permissions for inventory",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Graph permissions for conditional-access",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Active Entra role for conditional-access",
+        "ok": true,
+        "detail": "needs Conditional Access Administrator / Global Administrator / Security Administrator (PIM must be ACTIVE). Active: Global Administrator",
+        "blocking": true
+      },
+      {
+        "name": "Graph permissions for group-members",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Active Entra role for group-members",
+        "ok": true,
+        "detail": "needs Global Administrator / Groups Administrator / Privileged Role Administrator / User Administrator (PIM must be ACTIVE). Active: Global Administrator",
+        "blocking": true
+      },
+      {
+        "name": "'EXT - Block Fabrikam guests' keeps break-glass exclusions",
+        "ok": true,
+        "detail": "3 excluded user(s): bg-admin01@contoso.onmicrosoft.com, bg-admin02@contoso.onmicrosoft.com, meganb@contoso.com",
+        "blocking": true
+      },
+      {
+        "name": "Every break-glass account is excluded from 'EXT - Block Fabrikam guests'",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      }
+    ]
+  },
+  "items": [
+    {
+      "key": "conditional-access:0c1b5d2e-71aa-4e8f-9d3c-2b6f4a8e1c90",
+      "category": "conditional-access",
+      "id": "0c1b5d2e-71aa-4e8f-9d3c-2b6f4a8e1c90",
+      "name": "EXT - Block Fabrikam guests",
+      "action": "block-guests-by-domain",
+      "severity": "critical",
+      "reasons": [
+        "Block guests from acme.com (tenant 3f6b8d2a-1c4e-4a7b-9e0d-6f2a8c4e1b75)",
+        "Block guests from fabrikam.com (tenant 5e2a9c41-7d3b-4f10-8a66-2c9e1b7d0f33)",
+        "Block guests from acme-partners.io via static group (1 matched)",
+        "Block guests from gmail.com via static group (1 matched)"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "policyId": "0c1b5d2e-71aa-4e8f-9d3c-2b6f4a8e1c90",
+        "currentState": "enabled",
+        "currentExternalTenants": {
+          "@odata.type": "#microsoft.graph.conditionalAccessAllExternalTenants",
+          "membershipKind": "all"
+        },
+        "excludedUsers": [
+          {
+            "id": "00000001-c0de-4c0d-9e00-000000000001",
+            "displayName": "Break Glass 01",
+            "upn": "bg-admin01@contoso.onmicrosoft.com",
+            "type": "user"
+          },
+          {
+            "id": "00000002-c0de-4c0d-9e00-000000000002",
+            "displayName": "Break Glass 02",
+            "upn": "bg-admin02@contoso.onmicrosoft.com",
+            "type": "user"
+          },
+          {
+            "id": "00000003-c0de-4c0d-9e00-000000000003",
+            "displayName": "Megan Bowen",
+            "upn": "meganb@contoso.com",
+            "type": "user"
+          }
+        ],
+        "excludedGroups": [],
+        "grantControls": {
+          "operator": "OR",
+          "builtInControls": [
+            "block"
+          ]
+        },
+        "modifiedDateTime": "2026-10-20T17:34:06Z"
+      },
+      "before": {
+        "state": "enabled",
+        "conditions": {
+          "applications": {
+            "includeApplications": [
+              "All"
+            ],
+            "excludeApplications": []
+          },
+          "clientAppTypes": [
+            "all"
+          ],
+          "users": {
+            "includeUsers": [],
+            "excludeUsers": [
+              "00000001-c0de-4c0d-9e00-000000000001",
+              "00000002-c0de-4c0d-9e00-000000000002",
+              "00000003-c0de-4c0d-9e00-000000000003"
+            ],
+            "includeGroups": [],
+            "excludeGroups": [],
+            "includeRoles": [],
+            "excludeRoles": [],
+            "includeGuestsOrExternalUsers": {
+              "guestOrExternalUserTypes": "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider",
+              "externalTenants": {
+                "@odata.type": "#microsoft.graph.conditionalAccessAllExternalTenants",
+                "membershipKind": "all"
+              }
+            },
+            "excludeGuestsOrExternalUsers": null
+          }
+        }
+      },
+      "after": {
+        "state": "enabled",
+        "conditions": {
+          "applications": {
+            "includeApplications": [
+              "All"
+            ],
+            "excludeApplications": []
+          },
+          "clientAppTypes": [
+            "all"
+          ],
+          "users": {
+            "includeUsers": [],
+            "excludeUsers": [
+              "00000001-c0de-4c0d-9e00-000000000001",
+              "00000002-c0de-4c0d-9e00-000000000002",
+              "00000003-c0de-4c0d-9e00-000000000003"
+            ],
+            "includeGroups": [
+              "00001fa8-c0de-4c0d-9e00-000000001fa8"
+            ],
+            "excludeGroups": [],
+            "includeRoles": [],
+            "excludeRoles": [],
+            "includeGuestsOrExternalUsers": {
+              "guestOrExternalUserTypes": "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider",
+              "externalTenants": {
+                "@odata.type": "#microsoft.graph.conditionalAccessEnumeratedExternalTenants",
+                "membershipKind": "enumerated",
+                "members": [
+                  "3f6b8d2a-1c4e-4a7b-9e0d-6f2a8c4e1b75",
+                  "5e2a9c41-7d3b-4f10-8a66-2c9e1b7d0f33"
+                ]
+              }
+            },
+            "excludeGuestsOrExternalUsers": null
+          }
+        }
+      },
+      "status": "planned",
+      "error": null
+    },
+    {
+      "key": "group-members:00001fa8-c0de-4c0d-9e00-000000001fa8",
+      "category": "group-members",
+      "id": "00001fa8-c0de-4c0d-9e00-000000001fa8",
+      "name": "EMERGENCY - Blocked external guests",
+      "action": "add-members",
+      "severity": "high",
+      "reasons": [
+        "Guests from acme-partners.io, gmail.com (no Entra tenant)"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "members": [],
+        "adding": [
+          "0000000a-c0de-4c0d-9e00-00000000000a",
+          "0000000b-c0de-4c0d-9e00-00000000000b"
+        ],
+        "removing": [],
+        "roleAssignable": false
+      },
+      "before": {
+        "members": []
+      },
+      "after": {
+        "members": [
+          "0000000a-c0de-4c0d-9e00-00000000000a",
+          "0000000b-c0de-4c0d-9e00-00000000000b"
+        ]
+      },
+      "status": "planned",
+      "error": null
+    }
+  ],
+  "summary": {
+    "byCategory": {
+      "conditional-access": 1,
+      "group-members": 1
+    },
+    "byStatus": {
+      "planned": 2
+    },
+    "bySeverity": {
+      "critical": 1,
+      "high": 1
+    },
+    "total": 2
+  },
+  "notifications": []
+}</script>
 <script>
 (function(){
 const R = JSON.parse(document.getElementById('report-data').textContent);
 const app = document.getElementById('app');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const CAT = {'conditional-access':'Conditional Access','sftp':'SFTP storage','service-principal':'Enterprise apps','app-registration':'App registrations'};
+const CAT = {'conditional-access':'Conditional Access','user':'Users','revoke-sessions':'Sessions','group-members':'Group members','tenant-setting':'Tenant settings','service-principal':'Enterprise apps','app-registration':'App registrations','storage':'Storage','keyvault':'Key Vault','aks':'AKS','rg-lock':'Resource locks','sftp':'SFTP storage'};
 const SEV = {critical:0,high:1,medium:2,low:3};
 const mode = R.run.mode;
 const bannerCls = mode.startsWith('rollback') ? (mode.includes('refused')||mode.includes('aborted')?'refused':'roll')
@@ -135,6 +412,10 @@ function creds(list){
 function extra(it){
   const d = it.details||{}; let h='';
   if(d.excludedUsers) h += '<h4>Excluded (break-glass)</h4><div class="chips">'+d.excludedUsers.map(u=>`<span class="chip">${esc(u.displayName||u.id)} · ${esc(u.upn||'')}</span>`).join('')+'</div>';
+  if(d.blockedGroups) h += '<h4>Groups blocked</h4><div class="chips">'+d.blockedGroups.map(g=>`<span class="chip"><b>${esc(g.displayName)}</b></span>`).join('')+'</div>';
+  if(d.members){ const nm=Object.fromEntries(d.members.map(m=>[m.id,m.displayName||m.upn||m.id]));
+    if(d.removing?.length) h += '<h4>Members removed</h4><div class="chips">'+d.removing.map(i=>`<span class="chip c-high">${esc(nm[i]||i)}</span>`).join('')+'</div>';
+    if(d.adding?.length) h += '<h4>Members added</h4><div class="chips">'+d.adding.map(i=>`<span class="chip c-high">${esc(i)}</span>`).join('')+'</div>'; }
   if(d.currentExternalTenants) h += '<h4>External tenants in scope (before)</h4><pre>'+esc(JSON.stringify(d.currentExternalTenants,null,2))+'</pre>';
   if(d.localUsers?.length) h += '<h4>SFTP local users</h4><div class="chips">'+d.localUsers.map(u=>`<span class="chip">${esc(u)}</span>`).join('')+'</div>';
   if(d.tags && Object.keys(d.tags).length) h += '<h4>Tags</h4><div class="chips">'+Object.entries(d.tags).map(([k,v])=>`<span class="chip"><b>${esc(k)}</b>=${esc(v)}</span>`).join('')+'</div>';
@@ -146,11 +427,11 @@ function stateBox(it){
   return `<div class="full"><h4>State change</h4><div class="diff"><div><div class="sub">before</div><pre>${show(it.before)}</pre></div><div><div class="sub">after</div><pre>${show(it.after)}</pre></div></div></div>`;
 }
 function row(it){
-  const sub = it.category==='sftp' ? `${it.details.subscriptionName||''} / ${it.details.resourceGroup||''}`
+  const sub = ['sftp','storage','keyvault','aks'].includes(it.category) ? `${it.details.subscriptionName||''} / ${it.details.resourceGroup||''}`
     : it.details.appId ? `appId ${it.details.appId}` : it.id;
   return `<details class="row" data-cat="${esc(it.category)}" data-status="${esc(it.status)}" data-text="${esc((it.name+' '+it.id+' '+(it.details.appId||'')+' '+(it.owners||[]).map(o=>o.displayName+' '+(o.upn||'')).join(' ')+' '+(it.reasons||[]).join(' ')).toLowerCase())}">
   <summary><span><span class="pill sev-${esc(it.severity)}">${esc(it.severity)}</span></span>
-    <span><div class="name">${esc(it.name)}</div><div class="sub">${esc(CAT[it.category])} · ${esc(sub)} · action: <b>${esc(it.action)}</b></div></span>
+    <span><div class="name">${esc(it.name)}${it.irreversible?'<span class="irrev">IRREVERSIBLE</span>':''}</div><div class="sub">${esc(CAT[it.category])} · ${esc(sub)} · action: <b>${esc(it.action)}</b></div></span>
     <span class="pill st-${esc(it.status)}">${esc(it.status)}</span></summary>
   <div class="body">
     <div><h4>Why</h4><div class="chips">${(it.reasons||[]).map(r=>`<span class="chip">${esc(r)}</span>`).join('')}</div>
@@ -175,7 +456,7 @@ const statuses = [...new Set(items.map(i=>i.status))].sort();
 
 app.innerHTML = `
 <div class="banner ${bannerCls}"><span>${esc(bannerTxt)}</span><small>run ${esc(R.run.id.slice(0,8))}${R.run.sourceRunId?' · reverts '+esc(R.run.sourceRunId.slice(0,8)):''} <button class="theme" id="theme">◐ theme</button></small></div>
-<h1>Emergency lockdown report</h1>
+<h1>SHUTTER — Emergency containment report</h1>
 <div class="meta">
   <span>Tenant <code>${esc(R.run.tenantId)}</code></span>
   <span>Operator <b>${esc(R.run.operator?.upn)}</b> (${esc(R.run.operator?.kind)})</span>
@@ -188,7 +469,7 @@ app.innerHTML = `
 <h2>Objects</h2>
 <div class="toolbar" role="group" aria-label="Category">
   <button class="tab" data-cat="" aria-pressed="true">All (${items.length})</button>
-  ${Object.entries(CAT).map(([k,v])=>`<button class="tab" data-cat="${k}" aria-pressed="false">${esc(v)} (${count(i=>i.category===k)})</button>`).join('')}
+  ${Object.entries(CAT).filter(([k])=>count(i=>i.category===k)).map(([k,v])=>`<button class="tab" data-cat="${k}" aria-pressed="false">${esc(v)} (${count(i=>i.category===k)})</button>`).join('')}
 </div>
 <div class="toolbar">
   <input type="search" id="q" placeholder="Search name, appId, owner, permission…">
@@ -196,7 +477,7 @@ app.innerHTML = `
   <button class="tab" id="expand" aria-pressed="false">Expand all</button>
 </div>
 <div class="panel" id="list">${sorted.map(row).join('')}<div class="empty" id="empty" hidden>No objects match the filters</div></div>
-<div class="foot"><span>Rollback: <code>python -m persiana rollback report.json</code> (dry-run) · add <code>--execute</code> to revert</span><span>Generated by persiana</span></div>`;
+<div class="foot"><span>Rollback: <code>python -m shutter rollback report.json</code> (dry-run) · add <code>--execute</code> to revert</span><span>Generated by SHUTTER — Azure Emergency Containment &amp; Recovery</span></div>`;
 
 let cat='';
 const apply=()=>{const q=document.getElementById('q').value.toLowerCase(),st=document.getElementById('st').value;let n=0;

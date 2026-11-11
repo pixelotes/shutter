@@ -1,0 +1,122 @@
+# SHUTTER — Azure Emergency Containment & Recovery: configuration.
+# Every change to this file is part of the audit trail: its SHA-256 is written into each report.
+
+tenant_id = "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f"
+
+[conditional_access]
+# --disable-guests: policy that blocks guests. shutter rewrites its external-user scope (all external
+# tenants, or the tenants behind the given domains) and enables it.
+policy_id = "0c1b5d2e-71aa-4e8f-9d3c-2b6f4a8e1c90"   # "EXT - Block Fabrikam guests"
+# --disable-guests <domains>: guests whose domain has no Entra tenant (personal Microsoft accounts,
+# email one-time passcode) are added to this STATIC group, which the policy then includes.
+static_group_id = "00001fa8-c0de-4c0d-9e00-000000001fa8"
+# Refuse to run if a policy being enabled excludes fewer accounts than this (break-glass).
+min_excluded_users = 1
+
+[groups]
+# --disable-groups: a separate, pre-created CA policy that blocks all cloud apps, state = disabled,
+# with the break-glass accounts excluded. shutter adds the groups to it and enables it.
+block_policy_id = "9d4e2f1a-63bc-4d7e-a1f0-5c8b2e7d4a19"   # "EMERGENCY - Block listed groups"
+
+[aks]
+# --aks-mode restrict-api: the only IP ranges allowed to reach AKS API servers (SOC / bastion).
+authorized_ip_ranges = ["203.0.113.0/24"]
+
+[service_principals]
+enabled = true
+# Application permissions (app roles) that count as tenant-wide. Keyed by resource appId.
+[service_principals.dangerous_app_roles]
+"00000003-0000-0000-c000-000000000000" = [ # Microsoft Graph
+  "Directory.ReadWrite.All", "RoleManagement.ReadWrite.Directory", "AppRoleAssignment.ReadWrite.All",
+  "Application.ReadWrite.All", "Application.ReadWrite.OwnedBy", "User.ReadWrite.All", "Group.ReadWrite.All",
+  "GroupMember.ReadWrite.All", "Policy.ReadWrite.ConditionalAccess", "Policy.ReadWrite.AuthenticationMethod",
+  "UserAuthenticationMethod.ReadWrite.All", "Mail.ReadWrite", "Mail.Send", "MailboxSettings.ReadWrite",
+  "Files.ReadWrite.All", "Sites.FullControl.All", "Sites.ReadWrite.All", "Domain.ReadWrite.All",
+  "PrivilegedAccess.ReadWrite.AzureADGroup", "RoleAssignmentSchedule.ReadWrite.Directory",
+  "Directory.Read.All", "Mail.Read", "Files.Read.All", "Sites.Read.All", "User.Read.All",
+]
+"00000002-0000-0ff1-ce00-000000000000" = ["full_access_as_app", "Exchange.ManageAsApp"]  # Exchange Online
+"00000003-0000-0ff1-ce00-000000000000" = ["Sites.FullControl.All", "Sites.ReadWrite.All"] # SharePoint
+
+[service_principals.dangerous_delegated_scopes]
+# Delegated scopes consented for ALL users (consentType = AllPrincipals).
+"00000003-0000-0000-c000-000000000000" = [
+  "Directory.ReadWrite.All", "RoleManagement.ReadWrite.Directory", "Directory.AccessAsUser.All",
+  "Application.ReadWrite.All", "User.ReadWrite.All", "Mail.ReadWrite", "Mail.Send",
+  "Files.ReadWrite.All", "Sites.FullControl.All", "Policy.ReadWrite.ConditionalAccess",
+]
+
+# Read-only permissions are reported with lower severity but still flagged.
+[severity]
+low = ["Directory.Read.All", "User.Read.All", "Sites.Read.All", "Files.Read.All", "Mail.Read"]
+
+[rbac]
+# Azure RBAC roles on a subscription / management group / root scope that flag a service principal.
+dangerous_roles = ["Owner", "Contributor", "User Access Administrator", "Role Based Access Control Administrator"]
+
+[app_registrations]
+enabled = true
+
+[allowlist]
+# NEVER disable these. Microsoft first-party apps are always skipped.
+# Add: the identity running shutter, Sentinel playbooks / Logic Apps, Sentinel data connectors, backup tooling.
+app_ids = ["3a9e7c51-0b2d-4f6e-8a1c-5d7e9b3f0a24"]  # Sentinel playbook
+service_principal_ids = []
+owner_tenant_ids = [
+  "f8cdef31-a31e-4b4a-93e4-5f571e91255a", # Microsoft Services
+  "72f988bf-86f1-41af-91ab-2d7cd011db47", # Microsoft Corp
+]
+# Azure resources never touched (storage accounts, key vaults, AKS clusters, resource groups), by full ID.
+# The [control] storage account is always excluded automatically.
+resource_ids = []
+
+[break_glass]
+# Object IDs of the break-glass accounts. Preflight refuses to execute unless EVERY one is excluded
+# from the CA policy.
+user_ids = ["00000001-c0de-4c0d-9e00-000000000001", "00000002-c0de-4c0d-9e00-000000000002"]
+
+# ----------------------------------------------------------------------------------------------
+# Execution control (optional). Uses a blob container with Entra ID auth (the operator needs
+# "Storage Blob Data Contributor" on it). Enables:
+#   - a run lock shared by every operator (without it the lock only covers this machine)
+#   - two-person approvals
+#   - archiving of every execute / rollback report (put an immutability policy on the container)
+# [control]
+# storage_account = "stshuttercontrol"
+# container = "shutter"
+# archive_reports = true
+
+[approval]
+# Two-person rule: when true, `run --execute` only accepts `--from-plan <dry-run report.json>` that a
+# DIFFERENT identity approved with `shutter approve`. Requires [control].
+required = false
+# approver_group_id = "<entra-group-object-id>"
+ttl_minutes = 60
+
+# ----------------------------------------------------------------------------------------------
+# Notifications (optional, any number). Secrets come from environment variables.
+# events: dry-run, execute-start, execute-end, execute-refused, rollback-start, rollback-end
+#         (default: all except dry-run)
+#
+# [[notify]]
+# type = "teams"                          # Teams "Workflows" incoming webhook
+# url_env = "SHUTTER_TEAMS_WEBHOOK"
+#
+# [[notify]]
+# type = "slack"
+# url_env = "SHUTTER_SLACK_WEBHOOK"
+# events = ["execute-start", "execute-end", "rollback-end"]
+#
+# [[notify]]
+# type = "email"
+# smtp_host = "smtp.office365.com"
+# smtp_port = 587
+# from = "shutter@example.com"
+# to = ["soc@example.com", "it-infra@example.com"]
+# username_env = "SHUTTER_SMTP_USER"
+# password_env = "SHUTTER_SMTP_PASSWORD"
+# attach_report = true
+#
+# [[notify]]
+# type = "webhook"                        # generic JSON POST (e.g. SOAR, PagerDuty bridge)
+# url_env = "SHUTTER_WEBHOOK_URL"

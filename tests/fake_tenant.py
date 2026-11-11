@@ -1,4 +1,4 @@
-"""In-memory fake of the Graph / ARM endpoints persiana uses, populated with a Contoso tenant.
+"""In-memory fake of the Graph / ARM endpoints shutter uses, populated with a Contoso tenant.
 
 Used by tests and by examples/generate.py. Nothing here talks to Azure.
 """
@@ -8,7 +8,7 @@ import copy
 import re
 from urllib.parse import unquote
 
-from persiana.http import ARM, GRAPH, ApiError
+from shutter.http import ARM, GRAPH, ApiError
 
 TENANT = "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f"
 FABRIKAM = "5e2a9c41-7d3b-4f10-8a66-2c9e1b7d0f33"
@@ -166,12 +166,67 @@ def build_state() -> dict:
 
 
 OPERATOR = {"oid": gid(6), "upn": "alexw@contoso.com", "tid": TENANT,
-            "scp": "Application.ReadWrite.All AuditLog.Read.All Directory.Read.All Policy.Read.All Policy.ReadWrite.ConditionalAccess"}
+            "scp": "Application.ReadWrite.All AuditLog.Read.All Directory.Read.All GroupMember.ReadWrite.All Policy.Read.All "
+                   "Policy.ReadWrite.Authorization Policy.ReadWrite.ConditionalAccess User.ReadWrite.All"}
+
+
+CA_GROUPS_ID = "9d4e2f1a-63bc-4d7e-a1f0-5c8b2e7d4a19"
+ACME_TENANT = "3f6b8d2a-1c4e-4a7b-9e0d-6f2a8c4e1b75"
+SOC_GROUP = gid(8100)
+CONTRACTORS_GROUP = gid(8101)
+PRIV_GROUP = gid(8102)
+SYNCED_GROUP = gid(8103)
+GUEST_GROUP = gid(8104)
+RG_PROD = f"/subscriptions/{SUB_PROD}/resourceGroups/rg-data"
+AKS_PROD = f"/subscriptions/{SUB_PROD}/resourceGroups/rg-k8s/providers/Microsoft.ContainerService/managedClusters/aks-contoso-prod"
+KV_PROD = f"/subscriptions/{SUB_PROD}/resourceGroups/rg-sec/providers/Microsoft.KeyVault/vaults/kv-contoso-prod"
+
+
+def extend_state(s: dict) -> dict:
+    s["policies"] = {CA_ID: s["ca"], CA_GROUPS_ID: {
+        "id": CA_GROUPS_ID, "displayName": "EMERGENCY - Block listed groups", "state": "disabled",
+        "createdDateTime": "2026-11-01T09:00:00Z", "modifiedDateTime": "2026-11-01T09:00:00Z",
+        "conditions": {"applications": {"includeApplications": ["All"]}, "clientAppTypes": ["all"],
+                       "users": {"includeUsers": [], "excludeUsers": [gid(1), gid(2)], "includeGroups": [],
+                                 "excludeGroups": [SOC_GROUP]}},
+        "grantControls": {"operator": "OR", "builtInControls": ["block"]}}}
+    s["users"] = {i: {**u, "accountEnabled": True, "userType": "Member", "onPremisesSyncEnabled": None} for i, u in USERS.items()}
+    s["users"][gid(9)] = {"displayName": "Pat (ACME)", "userPrincipalName": "pat_acme.com#EXT#@contoso.onmicrosoft.com",
+                          "mail": "pat@acme.com", "accountEnabled": True, "userType": "Guest"}
+    s["users"][gid(10)] = {"displayName": "Sam (gmail)", "userPrincipalName": "sam_gmail.com#EXT#@contoso.onmicrosoft.com",
+                           "mail": "sam@gmail.com", "accountEnabled": True, "userType": "Guest"}
+    s["users"][gid(11)] = {"displayName": "Kim (personal, ACME contractor)", "userPrincipalName": "kim_outlook.com#EXT#@contoso.onmicrosoft.com",
+                           "mail": "kim@outlook.com", "otherMails": ["kim@acme-partners.io"], "accountEnabled": True, "userType": "Guest"}
+    s["users"][gid(12)] = {"displayName": "Jordan (synced)", "userPrincipalName": "jordan@contoso.com",
+                           "accountEnabled": True, "userType": "Member", "onPremisesSyncEnabled": True}
+    s["groups_full"] = {
+        SOC_GROUP: {"displayName": "SOC Team", "members": [gid(6)]},
+        CONTRACTORS_GROUP: {"displayName": "Contractors", "members": [gid(3), gid(7)]},
+        PRIV_GROUP: {"displayName": "PIM - Azure Owners", "isAssignableToRole": True, "members": [gid(1), gid(5), gid(7)]},
+        SYNCED_GROUP: {"displayName": "AD - Finance", "onPremisesSyncEnabled": True, "members": [gid(4)]},
+        GUEST_GROUP: {"displayName": "EMERGENCY - Blocked external guests", "members": []},
+    }
+    s["domains"] = {"acme.com": ACME_TENANT, "fabrikam.com": FABRIKAM}
+    s["revoked"] = []
+    s["authz"] = {"allowInvitesFrom": "everyone",
+                  "defaultUserRolePermissions": {"allowedToCreateApps": False, "allowedToCreateSecurityGroups": False,
+                                                 "permissionGrantPoliciesAssigned": ["ManagePermissionGrantsForSelf.microsoft-user-default-low",
+                                                                                     "ManagePermissionGrantsForOwnedResource.contoso"]}}
+    s["keyvaults"] = {KV_PROD: {"name": "kv-contoso-prod", "resourceGroup": "rg-sec", "subscriptionId": SUB_PROD,
+                                "location": "westeurope", "tags": {}, "publicNetworkAccess": "Enabled"},
+                      KV_PROD.replace("kv-contoso-prod", "kv-contoso-locked"): {
+                                "name": "kv-contoso-locked", "resourceGroup": "rg-sec", "subscriptionId": SUB_PROD,
+                                "location": "westeurope", "tags": {}, "publicNetworkAccess": "Disabled"}}
+    s["aks"] = {AKS_PROD: {"name": "aks-contoso-prod", "resourceGroup": "rg-k8s", "subscriptionId": SUB_PROD,
+                           "location": "westeurope", "powerState": "Running", "authorizedIPRanges": [], "privateCluster": False}}
+    s["rgs"] = {RG_PROD: {"name": "rg-data", "subscriptionId": SUB_PROD, "location": "westeurope", "tags": {}, "locks": {}},
+                f"/subscriptions/{SUB_DEV}/resourceGroups/rg-data": {"name": "rg-data", "subscriptionId": SUB_DEV, "location": "westeurope", "tags": {}, "locks": {}}}
+    return s
 
 
 class FakeTenant:
     def __init__(self):
-        self.s = build_state()
+        self.s = extend_state(build_state())
 
     def client(self, base: str, token=None):
         return FakeClient(self, base)
@@ -203,10 +258,68 @@ class FakeClient:
         path = url.split("?")[0]
         s = self.t.s
         fn = self._graph if self.base == GRAPH else self._arm
-        res = fn(method, url, path, body, s)
+        res = self._graph_extra(method, url, path, body, s) if self.base == GRAPH else None
+        if res is None:
+            res = fn(method, url, path, body, s)
         if res is None:
             raise ApiError(404, method, url, '{"error":{"code":"Request_ResourceNotFound"}}')
         return copy.deepcopy(res)
+
+    # ---------------------------------------------------------------- Graph (users, groups, tenant)
+    def _graph_extra(self, method, url, path, body, s):
+        users, groups = s["users"], s["groups_full"]
+        m = re.fullmatch(r"/v1\.0/identity/conditionalAccess/policies/([^/]+)", path)
+        if m and m[1] in s["policies"] and m[1] != CA_ID:
+            if method == "PATCH":
+                s["policies"][m[1]].update(copy.deepcopy(body))
+                return {}
+            return {"@odata.context": "x", **s["policies"][m[1]]}
+        m = re.fullmatch(r"/v1\.0/tenantRelationships/findTenantInformationByDomainName\(domainName='([^']+)'\)", path)
+        if m:
+            t = s["domains"].get(m[1])
+            return t and {"tenantId": t, "domainName": m[1]}
+        if path == "/v1.0/servicePrincipals":
+            name = re.search(r"displayName eq '([^']+)'", url)[1]
+            return {"value": [v for v in s["sps"].values() if v["displayName"] == name]}
+        if path == "/v1.0/users":
+            return {"value": [{"id": i, **u} for i, u in users.items() if u.get("userType") == "Guest"]}
+        m = re.fullmatch(r"/v1\.0/users/([^/]+)/revokeSignInSessions", path)
+        if m:
+            s["revoked"].append(m[1])
+            return {"value": True}
+        m = re.fullmatch(r"/v1\.0/users/([^/]+)", path)
+        if m:
+            uid = next((i for i, u in users.items() if i == m[1] or u["userPrincipalName"].lower() == m[1].lower()), None)
+            if not uid:
+                return None
+            if method == "PATCH":
+                users[uid].update(body)
+                return {}
+            return {"id": uid, **users[uid]}
+        if path == "/v1.0/groups":
+            name = re.search(r"displayName eq '([^']+)'", url)[1]
+            return {"value": [{"id": i, **g} for i, g in groups.items() if g["displayName"] == name]}
+        m = re.fullmatch(r"/v1\.0/groups/([^/]+)/members/\$ref", path)
+        if m and method == "POST":
+            groups[m[1]]["members"].append(body["@odata.id"].rsplit("/", 1)[1])
+            return {}
+        m = re.fullmatch(r"/v1\.0/groups/([^/]+)/members/([^/]+)/\$ref", path)
+        if m and method == "DELETE":
+            groups[m[1]]["members"].remove(m[2])
+            return {}
+        m = re.fullmatch(r"/v1\.0/groups/([^/]+)/members", path)
+        if m and m[1] in groups:
+            return {"value": [{"id": i, "displayName": users.get(i, {}).get("displayName")} for i in groups[m[1]]["members"]]}
+        m = re.fullmatch(r"/v1\.0/groups/([^/]+)", path)
+        if m:
+            g = groups.get(m[1])
+            return g and {"id": m[1], **{k: v for k, v in g.items() if k != "members"}}
+        if path == "/v1.0/policies/authorizationPolicy":
+            if method == "PATCH":
+                s["authz"].update(copy.deepcopy(body))
+                return {}
+            return copy.deepcopy(s["authz"])
+        return None
 
     # ---------------------------------------------------------------- Graph
     def _graph(self, method, url, path, body, s):
@@ -224,6 +337,9 @@ class FakeClient:
             return {"@odata.context": "x", **s["ca"]}
         if path == "/v1.0/directoryObjects/getByIds":
             return {"value": [o for o in (obj(i, None) for i in body["ids"]) if o]}
+        m = re.fullmatch(r"/v1\.0/directoryObjects/([^/]+)/checkMemberGroups", path)
+        if m:
+            return {"value": [g for g in body["groupIds"] if m[1] in s.get("groups", {}).get(g, [])]}
         if path == "/v1.0/me/transitiveMemberOf/microsoft.graph.directoryRole":
             return {"value": [{"roleTemplateId": "62e90394-69f5-4237-9190-012177145e10", "displayName": "Global Administrator"}]}
         m = re.fullmatch(r"/v1\.0/servicePrincipals\(appId='([^']+)'\)", path)
@@ -247,6 +363,9 @@ class FakeClient:
                 if m[1] in s["fail_patch"]:
                     raise ApiError(403, method, url, '{"error":{"code":"Authorization_RequestDenied","message":"Insufficient privileges to complete the operation."}}')
                 sps[m[1]].update(body)
+                if m[1] == s.get("crash_after_patch"):
+                    s["crash_after_patch"] = None
+                    raise KeyboardInterrupt("simulated crash right after the write landed")
                 return {}
             return sps[m[1]]
         if path == "/v1.0/oauth2PermissionGrants":
@@ -272,14 +391,24 @@ class FakeClient:
         if path == "/providers/Microsoft.ResourceGraph/resources":
             q = body["query"]
             subs = {x["subscriptionId"]: x["name"] for x in s["subs"]}
-            if "isSftpEnabled" in q:
-                return {"data": [{"id": i, "subscriptionName": subs[v["subscriptionId"]],
-                                  **{k: v[k] for k in ("name", "resourceGroup", "subscriptionId", "location", "tags", "isLocalUserEnabled", "publicNetworkAccess")}}
-                                 for i, v in st.items() if v["isSftpEnabled"]]}
             if "8e3af657" in q:
                 return {"data": [{"scope": i.lower(), "principalId": o} for i, v in st.items() for o in v["owners"]]}
+            if "microsoft.storage/storageaccounts" in q:
+                return {"data": [{"id": i, "subscriptionName": subs[v["subscriptionId"]],
+                                  **{k: v[k] for k in ("name", "resourceGroup", "subscriptionId", "location", "tags",
+                                                       "isSftpEnabled", "isLocalUserEnabled", "publicNetworkAccess")}}
+                                 for i, v in st.items()]}
+            if "microsoft.keyvault/vaults" in q:
+                return {"data": [{"id": i, **v} for i, v in s["keyvaults"].items()]}
+            if "microsoft.containerservice/managedclusters" in q:
+                return {"data": [{"id": i, "name": v["name"], "resourceGroup": v["resourceGroup"], "subscriptionId": v["subscriptionId"],
+                                  "location": v["location"], "tags": {}, "powerState": v["powerState"],
+                                  "authorizedIPRanges": v["authorizedIPRanges"], "privateCluster": v["privateCluster"],
+                                  "kubernetesVersion": "1.30.3"} for i, v in s["aks"].items()]}
             if "principalType" in q:
                 return {"data": s["rbac"]}
+            if "resourcegroups" in q:
+                return {"data": [{"id": i, **v} for i, v in s["rgs"].items()]}
             if "resourcecontainers" in q:
                 return {"data": s["subs"]}
             return {"data": []}
@@ -288,9 +417,72 @@ class FakeClient:
             return v and {"value": [{"name": n} for n in v["localUsers"]]}
         if path.endswith("/providers/Microsoft.Authorization/permissions"):
             return {"value": [{"actions": ["*"], "notActions": []}]}
+        m = re.fullmatch(r"(.+)/providers/Microsoft\.Authorization/locks/([^/]+)", path)
+        if m and m[1] in s["rgs"]:
+            locks = s["rgs"][m[1]].setdefault("locks", {})
+            if method == "PUT":
+                locks[m[2]] = body["properties"]["level"]
+                return {}
+            if method == "DELETE":
+                locks.pop(m[2], None)
+                return {}
+            return {"properties": {"level": locks[m[2]]}} if m[2] in locks else None
         if path in st:
             if method == "PATCH":
                 st[path].update(body["properties"])
                 return {}
-            return {"id": path, "properties": {"isSftpEnabled": st[path]["isSftpEnabled"]}}
+            return {"id": path, "properties": {k: st[path][k] for k in ("isSftpEnabled", "publicNetworkAccess")}}
+        if path in s["keyvaults"]:
+            if method == "PATCH":
+                s["keyvaults"][path].update(body["properties"])
+                return {}
+            return {"id": path, "properties": {"publicNetworkAccess": s["keyvaults"][path]["publicNetworkAccess"]}}
+        m = re.fullmatch(r"(.+)/(stop|start)", path)
+        if m and m[1] in s["aks"] and method == "POST":
+            s["aks"][m[1]]["powerState"] = "Stopped" if m[2] == "stop" else "Running"
+            return {}
+        if path in s["aks"]:
+            c = s["aks"][path]
+            if method == "PUT":
+                c["authorizedIPRanges"] = body["properties"]["apiServerAccessProfile"]["authorizedIPRanges"]
+                return {}
+            return {"id": path, "location": c["location"], "properties": {
+                "powerState": {"code": c["powerState"]}, "kubernetesVersion": "1.30.3",
+                "apiServerAccessProfile": {"authorizedIPRanges": c["authorizedIPRanges"], "enablePrivateCluster": c["privateCluster"]}}}
         return None
+
+
+# --------------------------------------------------------------------------- blob store fake
+class FakeBlobStore:
+    """In-memory stand-in for control.BlobStore with lease semantics. Shared across instances."""
+    blobs: dict = {}
+    leases: dict = {}
+
+    def __init__(self, account, container, token=None):
+        pass
+
+    @classmethod
+    def reset(cls):
+        cls.blobs, cls.leases = {}, {}
+
+    def put(self, name, data, lease_id=None, if_none_match=False, content_type=None):
+        if if_none_match and name in self.blobs:
+            return 409
+        if name in self.leases and self.leases[name] != lease_id:
+            return 412
+        self.blobs[name] = data
+        return 201
+
+    def get(self, name):
+        return self.blobs.get(name)
+
+    def lease(self, name, action, lease_id=None):
+        if action == "acquire":
+            if name in self.leases:
+                return 409, None
+            self.leases[name] = f"lease-{len(self.blobs)}"
+            return 201, self.leases[name]
+        if action in ("release", "break"):
+            self.leases.pop(name, None)
+            return 200 if action == "release" else 202, None
+        return 400, None

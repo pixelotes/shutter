@@ -10,7 +10,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "tests"), str(ROOT / "examples")]
 
 import fake_tenant as ft  # noqa: E402
 import generate  # noqa: E402
-from persiana import cli  # noqa: E402
+from shutter import cli  # noqa: E402
 
 
 class E2E(unittest.TestCase):
@@ -31,13 +31,13 @@ class E2E(unittest.TestCase):
 
     def test_dry_run_changes_nothing(self):
         before = json.dumps(self.t.s, sort_keys=True, default=str)
-        code, rep = self.run_cli("dry", "run")
+        code, rep = self.run_cli("dry", "run", "--all")
         self.assertEqual(code, 0)
         self.assertEqual(before, json.dumps(self.t.s, sort_keys=True, default=str))
         self.assertTrue(all(i["status"] != "applied" for i in rep["items"]))
 
     def test_allowlist_and_classification(self):
-        _, rep = self.run_cli("dry", "run")
+        _, rep = self.run_cli("dry", "run", "--all")
         i = self.by_name(rep)
         self.assertEqual(i["Sentinel-Playbook-Isolate-User|service-principal"]["status"], "skipped-allowlist")
         self.assertEqual(i["Microsoft Intune PowerShell|service-principal"]["status"], "skipped-allowlist")
@@ -48,7 +48,7 @@ class E2E(unittest.TestCase):
         self.assertNotIn("Contoso Reporting API|service-principal", i)  # RG-scoped RBAC is not flagged
 
     def test_wrong_confirmation_aborts(self):
-        _, rep = self.run_cli("x", "run", "--execute", "--confirm", "nope")
+        _, rep = self.run_cli("x", "run", "--all", "--execute", "--confirm", "nope")
         self.assertEqual(rep["run"]["mode"], "execute-aborted")
         self.assertTrue(self.t.s["sps"][ft.gid(200)]["accountEnabled"])
 
@@ -56,7 +56,7 @@ class E2E(unittest.TestCase):
         ft.OPERATOR_SAVED = dict(ft.OPERATOR)
         try:
             ft.OPERATOR["scp"] = "Directory.Read.All"
-            code, rep = self.run_cli("x", "run", "--execute", "--confirm", self.phrase)
+            code, rep = self.run_cli("x", "run", "--all", "--execute", "--confirm", self.phrase)
         finally:
             ft.OPERATOR.update(ft.OPERATOR_SAVED)
         self.assertEqual(code, 2)
@@ -65,7 +65,7 @@ class E2E(unittest.TestCase):
 
     def test_execute_then_rollback_restores_everything(self):
         original_ca = json.dumps(self.t.s["ca"], sort_keys=True)
-        code, rep = self.run_cli("exec", "run", "--execute", "--confirm", self.phrase)
+        code, rep = self.run_cli("exec", "run", "--all", "--execute", "--confirm", self.phrase)
         self.assertEqual(code, 1)  # Helpdesk Bot fails with 403
         self.assertEqual(self.t.s["ca"]["conditions"]["users"]["includeGuestsOrExternalUsers"]["externalTenants"]["membershipKind"], "all")
         self.assertFalse(any(v["isSftpEnabled"] for v in self.t.s["storage"].values()))
@@ -79,7 +79,7 @@ class E2E(unittest.TestCase):
         self.assertTrue(self.t.s["sps"][ft.gid(200)]["accountEnabled"])
 
     def test_rollback_detects_drift(self):
-        self.run_cli("exec", "run", "--execute", "--confirm", self.phrase)
+        self.run_cli("exec", "run", "--all", "--execute", "--confirm", self.phrase)
         self.t.s["ca"]["conditions"]["users"]["excludeUsers"].append(ft.gid(3))
         _, rb = self.run_cli("rb", "rollback", str(self.tmp / "exec" / "report.json"),
                              "--execute", "--confirm", f"ROLLBACK {ft.TENANT[:8]}")
@@ -88,7 +88,7 @@ class E2E(unittest.TestCase):
         self.assertEqual(self.t.s["ca"]["state"], "enabled")
 
     def test_rollback_refuses_dry_run_report(self):
-        self.run_cli("dry", "run")
+        self.run_cli("dry", "run", "--all")
         code = cli.main(["--config", self.cfg, "rollback", str(self.tmp / "dry" / "report.json")])
         self.assertEqual(code, 2)
 

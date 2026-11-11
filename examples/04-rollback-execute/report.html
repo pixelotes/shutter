@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Persiana Report</title>
+<title>SHUTTER Report</title>
 <style>
 :root{
   --bg:#f6f7f9;--panel:#fff;--ink:#16191f;--muted:#5d6675;--line:#e3e6eb;--chip:#eef0f4;
@@ -61,7 +61,9 @@ input[type=search]{flex:1;min-width:180px}
 .sev-low{background:var(--gray-bg);color:var(--muted)}
 .st-applied,.st-reverted{background:var(--ok-bg);color:var(--ok)}
 .st-planned{background:var(--info-bg);color:var(--info)}
-.st-failed,.st-drift{background:var(--crit-bg);color:var(--crit)}
+.st-failed,.st-drift,.st-in-progress{background:var(--crit-bg);color:var(--crit)}
+.st-irreversible{background:var(--high-bg);color:var(--high)}
+.irrev{display:inline-block;margin-left:6px;border-radius:999px;padding:1px 7px;font-size:11px;font-weight:700;background:var(--crit-bg);color:var(--crit)}
 .st-skipped,.st-skipped-allowlist,.st-covered,.st-report-only,.st-not-applicable{background:var(--gray-bg);color:var(--muted)}
 .body{padding:4px 16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .body h4{margin:8px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
@@ -90,16 +92,17 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
 <body>
 <div class="wrap" id="app"></div>
 <script id="report-data" type="application/json">{
-  "schema": 1,
+  "schema": 2,
   "tool": {
-    "name": "persiana",
+    "name": "shutter",
     "version": "0.1.0"
   },
   "run": {
-    "id": "885e7ba5-6e94-4246-b20f-03fed70ce6df",
+    "id": "b2433c99-6e15-4105-bb04-5869788368b4",
     "mode": "rollback-execute",
-    "startedAt": "2026-11-11T12:07:31+00:00",
-    "finishedAt": "2026-11-11T12:07:31+00:00",
+    "status": "completed",
+    "startedAt": "2026-11-11T15:39:47+00:00",
+    "finishedAt": "2026-11-11T15:39:47+00:00",
     "operator": {
       "kind": "user",
       "id": "00000006-c0de-4c0d-9e00-000000000006",
@@ -107,8 +110,8 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
       "appId": null
     },
     "tenantId": "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
-    "configSha256": "3b3533a4d4473a0bf24910cda22d42953dba39838fd447e1ed9d3c0b75f944df",
-    "sourceRunId": "4320bf8d-75b8-43c1-a383-7af399050db8"
+    "configSha256": "9939ce813c995638ddb04fd8901dea3723d6a511d0daa07c3ac6c60f70e0cc2f",
+    "sourceRunId": "52ee347e-b2cf-4b0c-b211-c6a9780252b3"
   },
   "preflight": {
     "ok": true,
@@ -120,37 +123,103 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
         "blocking": true
       },
       {
+        "name": "Graph permissions for inventory",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Graph permissions for app-registration",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Active Entra role for app-registration",
+        "ok": true,
+        "detail": "needs Application Administrator / Cloud Application Administrator / Global Administrator (PIM must be ACTIVE). Active: Global Administrator",
+        "blocking": true
+      },
+      {
         "name": "Graph permissions for conditional-access",
         "ok": true,
-        "detail": "ok: Policy.Read.All, Policy.ReadWrite.ConditionalAccess",
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Active Entra role for conditional-access",
+        "ok": true,
+        "detail": "needs Conditional Access Administrator / Global Administrator / Security Administrator (PIM must be ACTIVE). Active: Global Administrator",
+        "blocking": true
+      },
+      {
+        "name": "Graph permissions for group-members",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Active Entra role for group-members",
+        "ok": true,
+        "detail": "needs Global Administrator / Groups Administrator / Privileged Role Administrator / User Administrator (PIM must be ACTIVE). Active: Global Administrator",
         "blocking": true
       },
       {
         "name": "Graph permissions for service-principal",
         "ok": true,
-        "detail": "ok: Application.ReadWrite.All",
+        "detail": "ok",
         "blocking": true
       },
       {
-        "name": "Graph permissions for inventory",
+        "name": "Active Entra role for service-principal",
         "ok": true,
-        "detail": "ok: Directory.Read.All",
+        "detail": "needs Application Administrator / Cloud Application Administrator / Global Administrator (PIM must be ACTIVE). Active: Global Administrator",
         "blocking": true
       },
       {
-        "name": "Active Entra role for Conditional Access",
+        "name": "Graph permissions for tenant-setting",
         "ok": true,
-        "detail": "needs CA Admin / Security Admin / Global Admin (PIM must be ACTIVE). Active: Global Administrator",
+        "detail": "ok",
         "blocking": true
       },
       {
-        "name": "Active Entra role for applications",
+        "name": "Active Entra role for tenant-setting",
         "ok": true,
-        "detail": "needs Cloud App Admin / App Admin / Global Admin (PIM must be ACTIVE). Active: Global Administrator",
+        "detail": "needs Global Administrator / Privileged Role Administrator (PIM must be ACTIVE). Active: Global Administrator",
         "blocking": true
       },
       {
-        "name": "Microsoft.Storage/storageAccounts/write on 3 SFTP storage account(s)",
+        "name": "Graph permissions for user",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Active Entra role for user",
+        "ok": true,
+        "detail": "needs Global Administrator / Privileged Authentication Administrator / User Administrator (PIM must be ACTIVE). Active: Global Administrator",
+        "blocking": true
+      },
+      {
+        "name": "Microsoft.Authorization/locks/write on 1 resource(s)",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Microsoft.ContainerService/managedClusters/stop/action on 1 resource(s)",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Microsoft.KeyVault/vaults/write on 1 resource(s)",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      },
+      {
+        "name": "Microsoft.Storage/storageAccounts/write on 3 resource(s)",
         "ok": true,
         "detail": "ok",
         "blocking": true
@@ -158,6 +227,203 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
     ]
   },
   "items": [
+    {
+      "key": "aks:/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-k8s/providers/Microsoft.ContainerService/managedClusters/aks-contoso-prod",
+      "category": "aks",
+      "id": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-k8s/providers/Microsoft.ContainerService/managedClusters/aks-contoso-prod",
+      "name": "aks-contoso-prod",
+      "action": "aks-stop",
+      "severity": "high",
+      "reasons": [
+        "Stop the cluster (control plane and nodes)"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "resourceGroup": "rg-k8s",
+        "subscriptionId": "2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
+        "location": "westeurope",
+        "kubernetesVersion": "1.30.3",
+        "privateCluster": false,
+        "powerState": "Running",
+        "authorizedIPRanges": [],
+        "tags": {}
+      },
+      "before": {
+        "powerState": "Running"
+      },
+      "after": {
+        "powerState": "Stopped"
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "keyvault:/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-sec/providers/Microsoft.KeyVault/vaults/kv-contoso-prod",
+      "category": "keyvault",
+      "id": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-sec/providers/Microsoft.KeyVault/vaults/kv-contoso-prod",
+      "name": "kv-contoso-prod",
+      "action": "disable-public-access",
+      "severity": "high",
+      "reasons": [
+        "Public network access: Enabled"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "resourceGroup": "rg-sec",
+        "subscriptionId": "2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
+        "location": "westeurope",
+        "tags": {}
+      },
+      "before": {
+        "publicNetworkAccess": "Enabled"
+      },
+      "after": {
+        "publicNetworkAccess": "Disabled"
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "storage:/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontososftpprod",
+      "category": "storage",
+      "id": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontososftpprod",
+      "name": "stcontososftpprod",
+      "action": "disable-sftp+disable-public-access",
+      "severity": "high",
+      "reasons": [
+        "SFTP endpoint enabled",
+        "Public network access: Enabled"
+      ],
+      "permissions": [],
+      "owners": [
+        {
+          "id": "00000003-c0de-4c0d-9e00-000000000003",
+          "displayName": "Megan Bowen",
+          "upn": "meganb@contoso.com",
+          "type": "user"
+        },
+        {
+          "displayName": "data-platform",
+          "type": "tag:owner"
+        }
+      ],
+      "details": {
+        "subscriptionName": "Contoso Production",
+        "subscriptionId": "2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
+        "resourceGroup": "rg-data",
+        "location": "westeurope",
+        "isSftpEnabled": true,
+        "isLocalUserEnabled": true,
+        "publicNetworkAccess": "Enabled",
+        "localUsers": [
+          "fabrikam-upload",
+          "payroll-drop"
+        ],
+        "tags": {
+          "owner": "data-platform",
+          "costcenter": "CC-1042"
+        }
+      },
+      "before": {
+        "isSftpEnabled": true,
+        "publicNetworkAccess": "Enabled"
+      },
+      "after": {
+        "isSftpEnabled": false,
+        "publicNetworkAccess": "Disabled"
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "storage:/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-partners/providers/Microsoft.Storage/storageAccounts/stpartnerexchange",
+      "category": "storage",
+      "id": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-partners/providers/Microsoft.Storage/storageAccounts/stpartnerexchange",
+      "name": "stpartnerexchange",
+      "action": "disable-sftp+disable-public-access",
+      "severity": "high",
+      "reasons": [
+        "SFTP endpoint enabled",
+        "Public network access: Enabled"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "subscriptionName": "Contoso Production",
+        "subscriptionId": "2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
+        "resourceGroup": "rg-partners",
+        "location": "westeurope",
+        "isSftpEnabled": true,
+        "isLocalUserEnabled": true,
+        "publicNetworkAccess": "Enabled",
+        "localUsers": [
+          "northwind"
+        ],
+        "tags": {}
+      },
+      "before": {
+        "isSftpEnabled": true,
+        "publicNetworkAccess": "Enabled"
+      },
+      "after": {
+        "isSftpEnabled": false,
+        "publicNetworkAccess": "Disabled"
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "storage:/subscriptions/7c3f1e8a-2d4b-4a6c-9e1f-5b8d0c2a4e63/resourceGroups/rg-dev/providers/Microsoft.Storage/storageAccounts/stcontosodevsftp",
+      "category": "storage",
+      "id": "/subscriptions/7c3f1e8a-2d4b-4a6c-9e1f-5b8d0c2a4e63/resourceGroups/rg-dev/providers/Microsoft.Storage/storageAccounts/stcontosodevsftp",
+      "name": "stcontosodevsftp",
+      "action": "disable-sftp",
+      "severity": "high",
+      "reasons": [
+        "SFTP endpoint enabled"
+      ],
+      "permissions": [],
+      "owners": [
+        {
+          "id": "00000005-c0de-4c0d-9e00-000000000005",
+          "displayName": "Lee Gu",
+          "upn": "leeg@contoso.com",
+          "type": "user"
+        },
+        {
+          "displayName": "leeg@contoso.com",
+          "type": "tag:createdBy"
+        }
+      ],
+      "details": {
+        "subscriptionName": "Contoso Dev",
+        "subscriptionId": "7c3f1e8a-2d4b-4a6c-9e1f-5b8d0c2a4e63",
+        "resourceGroup": "rg-dev",
+        "location": "northeurope",
+        "isSftpEnabled": true,
+        "isLocalUserEnabled": false,
+        "publicNetworkAccess": "Disabled",
+        "localUsers": [],
+        "tags": {
+          "createdBy": "leeg@contoso.com"
+        }
+      },
+      "before": {
+        "isSftpEnabled": true
+      },
+      "after": {
+        "isSftpEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
     {
       "key": "app-registration:0000012c-c0de-4c0d-9e00-00000000012c",
       "category": "app-registration",
@@ -382,7 +648,7 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
       "severity": "medium",
       "reasons": [
         "application (requested): User.ReadWrite.All",
-        "In persiana.toml allowlist"
+        "In shutter.toml allowlist"
       ],
       "permissions": [
         {
@@ -415,59 +681,6 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
       "status": "not-applicable",
       "error": null,
       "revertOf": "skipped-allowlist"
-    },
-    {
-      "key": "service-principal:000000c9-c0de-4c0d-9e00-0000000000c9",
-      "category": "service-principal",
-      "id": "000000c9-c0de-4c0d-9e00-0000000000c9",
-      "name": "Legacy Backup Tool",
-      "action": "disable-service-principal",
-      "severity": "high",
-      "reasons": [
-        "application: Files.ReadWrite.All",
-        "application: Mail.ReadWrite",
-        "application: Sites.FullControl.All"
-      ],
-      "permissions": [
-        {
-          "type": "application",
-          "resource": "Office 365 SharePoint Online",
-          "value": "Sites.FullControl.All",
-          "grantedAt": "2024-05-01T10:00:00Z"
-        },
-        {
-          "type": "application",
-          "resource": "Microsoft Graph",
-          "value": "Mail.ReadWrite",
-          "grantedAt": "2024-05-01T10:00:00Z"
-        },
-        {
-          "type": "application",
-          "resource": "Microsoft Graph",
-          "value": "Files.ReadWrite.All",
-          "grantedAt": "2024-05-01T10:00:00Z"
-        }
-      ],
-      "owners": [],
-      "details": {
-        "appId": "000023f1-c0de-4c0d-9e00-0000000023f1",
-        "servicePrincipalType": "Application",
-        "publisher": "Northwind Traders",
-        "verifiedPublisher": null,
-        "ownerTenantId": "a7d1e3f5-9b2c-4d6e-8f0a-1c3e5a7b9d2f",
-        "homeTenant": false,
-        "createdDateTime": "2019-11-20T16:45:00Z",
-        "lastSignIn": "2026-11-10T23:41:00Z"
-      },
-      "before": {
-        "accountEnabled": true
-      },
-      "after": {
-        "accountEnabled": false
-      },
-      "status": "reverted",
-      "error": null,
-      "revertOf": "applied"
     },
     {
       "key": "service-principal:000000c8-c0de-4c0d-9e00-0000000000c8",
@@ -517,6 +730,59 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
         "homeTenant": true,
         "createdDateTime": "2022-06-01T10:00:00Z",
         "lastSignIn": "2026-11-11T06:02:00Z"
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "service-principal:000000c9-c0de-4c0d-9e00-0000000000c9",
+      "category": "service-principal",
+      "id": "000000c9-c0de-4c0d-9e00-0000000000c9",
+      "name": "Legacy Backup Tool",
+      "action": "disable-service-principal",
+      "severity": "high",
+      "reasons": [
+        "application: Files.ReadWrite.All",
+        "application: Mail.ReadWrite",
+        "application: Sites.FullControl.All"
+      ],
+      "permissions": [
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "Mail.ReadWrite",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        },
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "Files.ReadWrite.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        },
+        {
+          "type": "application",
+          "resource": "Office 365 SharePoint Online",
+          "value": "Sites.FullControl.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        }
+      ],
+      "owners": [],
+      "details": {
+        "appId": "000023f1-c0de-4c0d-9e00-0000000023f1",
+        "servicePrincipalType": "Application",
+        "publisher": "Northwind Traders",
+        "verifiedPublisher": null,
+        "ownerTenantId": "a7d1e3f5-9b2c-4d6e-8f0a-1c3e5a7b9d2f",
+        "homeTenant": false,
+        "createdDateTime": "2019-11-20T16:45:00Z",
+        "lastSignIn": "2026-11-10T23:41:00Z"
       },
       "before": {
         "accountEnabled": true
@@ -736,7 +1002,7 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
       "severity": "high",
       "reasons": [
         "application: User.ReadWrite.All",
-        "In persiana.toml allowlist"
+        "In shutter.toml allowlist"
       ],
       "permissions": [
         {
@@ -815,139 +1081,236 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
       "revertOf": "skipped-allowlist"
     },
     {
-      "key": "sftp:/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontososftpprod",
-      "category": "sftp",
-      "id": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontososftpprod",
-      "name": "stcontososftpprod",
-      "action": "disable-sftp",
-      "severity": "high",
+      "key": "rg-lock:/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-data",
+      "category": "rg-lock",
+      "id": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-data",
+      "name": "rg-data",
+      "action": "add-delete-lock",
+      "severity": "medium",
       "reasons": [
-        "SFTP endpoint enabled on storage account"
-      ],
-      "permissions": [],
-      "owners": [
-        {
-          "id": "00000003-c0de-4c0d-9e00-000000000003",
-          "displayName": "Megan Bowen",
-          "upn": "meganb@contoso.com",
-          "type": "user"
-        },
-        {
-          "displayName": "data-platform",
-          "type": "tag:owner"
-        }
-      ],
-      "details": {
-        "subscriptionName": "Contoso Production",
-        "subscriptionId": "2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
-        "resourceGroup": "rg-data",
-        "location": "westeurope",
-        "isLocalUserEnabled": true,
-        "publicNetworkAccess": "Enabled",
-        "localUsers": [
-          "fabrikam-upload",
-          "payroll-drop"
-        ],
-        "tags": {
-          "owner": "data-platform",
-          "costcenter": "CC-1042"
-        }
-      },
-      "before": {
-        "isSftpEnabled": true
-      },
-      "after": {
-        "isSftpEnabled": false
-      },
-      "status": "reverted",
-      "error": null,
-      "revertOf": "applied"
-    },
-    {
-      "key": "sftp:/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-partners/providers/Microsoft.Storage/storageAccounts/stpartnerexchange",
-      "category": "sftp",
-      "id": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-partners/providers/Microsoft.Storage/storageAccounts/stpartnerexchange",
-      "name": "stpartnerexchange",
-      "action": "disable-sftp",
-      "severity": "high",
-      "reasons": [
-        "SFTP endpoint enabled on storage account"
+        "CanNotDelete lock against destruction / ransomware"
       ],
       "permissions": [],
       "owners": [],
       "details": {
-        "subscriptionName": "Contoso Production",
         "subscriptionId": "2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
-        "resourceGroup": "rg-partners",
         "location": "westeurope",
-        "isLocalUserEnabled": true,
-        "publicNetworkAccess": "Enabled",
-        "localUsers": [
-          "northwind"
-        ],
-        "tags": {}
+        "lockName": "shutter-emergency"
       },
       "before": {
-        "isSftpEnabled": true
+        "lock": null
       },
       "after": {
-        "isSftpEnabled": false
+        "lock": "CanNotDelete"
       },
       "status": "reverted",
       "error": null,
       "revertOf": "applied"
     },
     {
-      "key": "sftp:/subscriptions/7c3f1e8a-2d4b-4a6c-9e1f-5b8d0c2a4e63/resourceGroups/rg-dev/providers/Microsoft.Storage/storageAccounts/stcontosodevsftp",
-      "category": "sftp",
-      "id": "/subscriptions/7c3f1e8a-2d4b-4a6c-9e1f-5b8d0c2a4e63/resourceGroups/rg-dev/providers/Microsoft.Storage/storageAccounts/stcontosodevsftp",
-      "name": "stcontosodevsftp",
-      "action": "disable-sftp",
-      "severity": "high",
+      "key": "tenant-setting:allowInvitesFrom",
+      "category": "tenant-setting",
+      "id": "allowInvitesFrom",
+      "name": "Guest invitations",
+      "action": "disable-guest-invites",
+      "severity": "medium",
       "reasons": [
-        "SFTP endpoint enabled on storage account"
+        "Nobody can invite new guests"
       ],
       "permissions": [],
-      "owners": [
-        {
-          "id": "00000005-c0de-4c0d-9e00-000000000005",
-          "displayName": "Lee Gu",
-          "upn": "leeg@contoso.com",
-          "type": "user"
-        },
-        {
-          "displayName": "leeg@contoso.com",
-          "type": "tag:createdBy"
-        }
-      ],
+      "owners": [],
       "details": {
-        "subscriptionName": "Contoso Dev",
-        "subscriptionId": "7c3f1e8a-2d4b-4a6c-9e1f-5b8d0c2a4e63",
-        "resourceGroup": "rg-dev",
-        "location": "northeurope",
-        "isLocalUserEnabled": false,
-        "publicNetworkAccess": "Disabled",
-        "localUsers": [],
-        "tags": {
-          "createdBy": "leeg@contoso.com"
-        }
+        "current": "everyone"
       },
       "before": {
-        "isSftpEnabled": true
+        "allowInvitesFrom": "everyone"
       },
       "after": {
-        "isSftpEnabled": false
+        "allowInvitesFrom": "none"
       },
       "status": "reverted",
       "error": null,
       "revertOf": "applied"
+    },
+    {
+      "key": "tenant-setting:userConsent",
+      "category": "tenant-setting",
+      "id": "userConsent",
+      "name": "User consent to apps",
+      "action": "disable-user-consent",
+      "severity": "high",
+      "reasons": [
+        "Users can no longer consent to applications (consent phishing)"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "current": [
+          "ManagePermissionGrantsForSelf.microsoft-user-default-low",
+          "ManagePermissionGrantsForOwnedResource.contoso"
+        ]
+      },
+      "before": {
+        "defaultUserRolePermissions": {
+          "allowedToCreateApps": false,
+          "allowedToCreateSecurityGroups": false,
+          "permissionGrantPoliciesAssigned": [
+            "ManagePermissionGrantsForSelf.microsoft-user-default-low",
+            "ManagePermissionGrantsForOwnedResource.contoso"
+          ]
+        }
+      },
+      "after": {
+        "defaultUserRolePermissions": {
+          "allowedToCreateApps": false,
+          "allowedToCreateSecurityGroups": false,
+          "permissionGrantPoliciesAssigned": [
+            "ManagePermissionGrantsForOwnedResource.contoso"
+          ]
+        }
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "group-members:00001fa6-c0de-4c0d-9e00-000000001fa6",
+      "category": "group-members",
+      "id": "00001fa6-c0de-4c0d-9e00-000000001fa6",
+      "name": "PIM - Azure Owners",
+      "action": "remove-members",
+      "severity": "critical",
+      "reasons": [
+        "Emergency removal of all members"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "members": [
+          {
+            "id": "00000001-c0de-4c0d-9e00-000000000001",
+            "displayName": "Break Glass 01",
+            "upn": null
+          },
+          {
+            "id": "00000005-c0de-4c0d-9e00-000000000005",
+            "displayName": "Lee Gu",
+            "upn": null
+          },
+          {
+            "id": "00000007-c0de-4c0d-9e00-000000000007",
+            "displayName": "Diego Siciliani",
+            "upn": null
+          }
+        ],
+        "adding": [],
+        "removing": [
+          "00000005-c0de-4c0d-9e00-000000000005",
+          "00000007-c0de-4c0d-9e00-000000000007"
+        ],
+        "roleAssignable": true
+      },
+      "before": {
+        "members": [
+          "00000001-c0de-4c0d-9e00-000000000001",
+          "00000005-c0de-4c0d-9e00-000000000005",
+          "00000007-c0de-4c0d-9e00-000000000007"
+        ]
+      },
+      "after": {
+        "members": [
+          "00000001-c0de-4c0d-9e00-000000000001"
+        ]
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "revoke-sessions:00000007-c0de-4c0d-9e00-000000000007",
+      "category": "revoke-sessions",
+      "id": "00000007-c0de-4c0d-9e00-000000000007",
+      "name": "Diego Siciliani",
+      "action": "revoke-sign-in-sessions",
+      "severity": "high",
+      "reasons": [
+        "Invalidate refresh tokens and session cookies",
+        "Cannot be rolled back"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "upn": "diegos@contoso.com",
+        "irreversible": true
+      },
+      "before": null,
+      "after": null,
+      "status": "irreversible",
+      "error": null,
+      "irreversible": true,
+      "revertOf": "applied"
+    },
+    {
+      "key": "user:00000007-c0de-4c0d-9e00-000000000007",
+      "category": "user",
+      "id": "00000007-c0de-4c0d-9e00-000000000007",
+      "name": "Diego Siciliani",
+      "action": "disable-user",
+      "severity": "high",
+      "reasons": [
+        "Listed as compromised / to be disabled"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "upn": "diegos@contoso.com",
+        "userType": "Member",
+        "onPremisesSyncEnabled": null
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "user:0000000c-c0de-4c0d-9e00-00000000000c",
+      "category": "user",
+      "id": "0000000c-c0de-4c0d-9e00-00000000000c",
+      "name": "Jordan (synced)",
+      "action": "report-only",
+      "severity": "high",
+      "reasons": [
+        "Listed as compromised / to be disabled",
+        "Synced from on-prem AD: disable it there (cloud changes are overwritten)"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "upn": "jordan@contoso.com",
+        "userType": "Member",
+        "onPremisesSyncEnabled": true
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "not-applicable",
+      "error": null,
+      "revertOf": "report-only"
     },
     {
       "key": "conditional-access:0c1b5d2e-71aa-4e8f-9d3c-2b6f4a8e1c90",
       "category": "conditional-access",
       "id": "0c1b5d2e-71aa-4e8f-9d3c-2b6f4a8e1c90",
       "name": "EXT - Block Fabrikam guests",
-      "action": "widen-to-all-external-tenants",
+      "action": "block-all-guests",
       "severity": "critical",
       "reasons": [
         "Block sign-in for every guest / external user (all external tenants)"
@@ -955,6 +1318,7 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
       "permissions": [],
       "owners": [],
       "details": {
+        "policyId": "0c1b5d2e-71aa-4e8f-9d3c-2b6f4a8e1c90",
         "currentState": {
           "state": "enabled",
           "conditions": {
@@ -1089,29 +1453,139 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
         }
       },
       "status": "drift",
-      "error": "Current state differs from what persiana set; use --force to overwrite",
+      "error": "Current state differs from what shutter set; use --force to overwrite",
+      "revertOf": "applied"
+    },
+    {
+      "key": "conditional-access:9d4e2f1a-63bc-4d7e-a1f0-5c8b2e7d4a19",
+      "category": "conditional-access",
+      "id": "9d4e2f1a-63bc-4d7e-a1f0-5c8b2e7d4a19",
+      "name": "EMERGENCY - Block listed groups",
+      "action": "block-groups",
+      "severity": "critical",
+      "reasons": [
+        "Block sign-in for members of Contractors"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "policyId": "9d4e2f1a-63bc-4d7e-a1f0-5c8b2e7d4a19",
+        "currentState": "disabled",
+        "currentExternalTenants": {},
+        "excludedUsers": [
+          {
+            "id": "00000001-c0de-4c0d-9e00-000000000001",
+            "displayName": "Break Glass 01",
+            "upn": "bg-admin01@contoso.onmicrosoft.com",
+            "type": "user"
+          },
+          {
+            "id": "00000002-c0de-4c0d-9e00-000000000002",
+            "displayName": "Break Glass 02",
+            "upn": "bg-admin02@contoso.onmicrosoft.com",
+            "type": "user"
+          }
+        ],
+        "excludedGroups": [
+          "00001fa4-c0de-4c0d-9e00-000000001fa4"
+        ],
+        "grantControls": {
+          "operator": "OR",
+          "builtInControls": [
+            "block"
+          ]
+        },
+        "modifiedDateTime": "2026-11-01T09:00:00Z",
+        "blockedGroups": [
+          {
+            "id": "00001fa5-c0de-4c0d-9e00-000000001fa5",
+            "displayName": "Contractors"
+          }
+        ]
+      },
+      "before": {
+        "state": "disabled",
+        "conditions": {
+          "applications": {
+            "includeApplications": [
+              "All"
+            ]
+          },
+          "clientAppTypes": [
+            "all"
+          ],
+          "users": {
+            "includeUsers": [],
+            "excludeUsers": [
+              "00000001-c0de-4c0d-9e00-000000000001",
+              "00000002-c0de-4c0d-9e00-000000000002"
+            ],
+            "includeGroups": [],
+            "excludeGroups": [
+              "00001fa4-c0de-4c0d-9e00-000000001fa4"
+            ]
+          }
+        }
+      },
+      "after": {
+        "state": "enabled",
+        "conditions": {
+          "applications": {
+            "includeApplications": [
+              "All"
+            ]
+          },
+          "clientAppTypes": [
+            "all"
+          ],
+          "users": {
+            "includeUsers": [],
+            "excludeUsers": [
+              "00000001-c0de-4c0d-9e00-000000000001",
+              "00000002-c0de-4c0d-9e00-000000000002"
+            ],
+            "includeGroups": [
+              "00001fa5-c0de-4c0d-9e00-000000001fa5"
+            ],
+            "excludeGroups": [
+              "00001fa4-c0de-4c0d-9e00-000000001fa4"
+            ]
+          }
+        }
+      },
+      "status": "reverted",
+      "error": null,
       "revertOf": "applied"
     }
   ],
+  "notifications": [],
   "summary": {
     "byCategory": {
+      "aks": 1,
+      "keyvault": 1,
+      "storage": 3,
       "app-registration": 5,
       "service-principal": 8,
-      "sftp": 3,
-      "conditional-access": 1
+      "rg-lock": 1,
+      "tenant-setting": 2,
+      "group-members": 1,
+      "revoke-sessions": 1,
+      "user": 2,
+      "conditional-access": 2
     },
     "byStatus": {
-      "not-applicable": 8,
-      "reverted": 7,
+      "reverted": 15,
+      "not-applicable": 9,
       "skipped": 1,
+      "irreversible": 1,
       "drift": 1
     },
     "bySeverity": {
-      "high": 12,
-      "medium": 2,
-      "critical": 3
+      "high": 18,
+      "medium": 4,
+      "critical": 5
     },
-    "total": 17
+    "total": 27
   }
 }</script>
 <script>
@@ -1119,7 +1593,7 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
 const R = JSON.parse(document.getElementById('report-data').textContent);
 const app = document.getElementById('app');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const CAT = {'conditional-access':'Conditional Access','sftp':'SFTP storage','service-principal':'Enterprise apps','app-registration':'App registrations'};
+const CAT = {'conditional-access':'Conditional Access','user':'Users','revoke-sessions':'Sessions','group-members':'Group members','tenant-setting':'Tenant settings','service-principal':'Enterprise apps','app-registration':'App registrations','storage':'Storage','keyvault':'Key Vault','aks':'AKS','rg-lock':'Resource locks','sftp':'SFTP storage'};
 const SEV = {critical:0,high:1,medium:2,low:3};
 const mode = R.run.mode;
 const bannerCls = mode.startsWith('rollback') ? (mode.includes('refused')||mode.includes('aborted')?'refused':'roll')
@@ -1159,6 +1633,10 @@ function creds(list){
 function extra(it){
   const d = it.details||{}; let h='';
   if(d.excludedUsers) h += '<h4>Excluded (break-glass)</h4><div class="chips">'+d.excludedUsers.map(u=>`<span class="chip">${esc(u.displayName||u.id)} · ${esc(u.upn||'')}</span>`).join('')+'</div>';
+  if(d.blockedGroups) h += '<h4>Groups blocked</h4><div class="chips">'+d.blockedGroups.map(g=>`<span class="chip"><b>${esc(g.displayName)}</b></span>`).join('')+'</div>';
+  if(d.members){ const nm=Object.fromEntries(d.members.map(m=>[m.id,m.displayName||m.upn||m.id]));
+    if(d.removing?.length) h += '<h4>Members removed</h4><div class="chips">'+d.removing.map(i=>`<span class="chip c-high">${esc(nm[i]||i)}</span>`).join('')+'</div>';
+    if(d.adding?.length) h += '<h4>Members added</h4><div class="chips">'+d.adding.map(i=>`<span class="chip c-high">${esc(i)}</span>`).join('')+'</div>'; }
   if(d.currentExternalTenants) h += '<h4>External tenants in scope (before)</h4><pre>'+esc(JSON.stringify(d.currentExternalTenants,null,2))+'</pre>';
   if(d.localUsers?.length) h += '<h4>SFTP local users</h4><div class="chips">'+d.localUsers.map(u=>`<span class="chip">${esc(u)}</span>`).join('')+'</div>';
   if(d.tags && Object.keys(d.tags).length) h += '<h4>Tags</h4><div class="chips">'+Object.entries(d.tags).map(([k,v])=>`<span class="chip"><b>${esc(k)}</b>=${esc(v)}</span>`).join('')+'</div>';
@@ -1170,11 +1648,11 @@ function stateBox(it){
   return `<div class="full"><h4>State change</h4><div class="diff"><div><div class="sub">before</div><pre>${show(it.before)}</pre></div><div><div class="sub">after</div><pre>${show(it.after)}</pre></div></div></div>`;
 }
 function row(it){
-  const sub = it.category==='sftp' ? `${it.details.subscriptionName||''} / ${it.details.resourceGroup||''}`
+  const sub = ['sftp','storage','keyvault','aks'].includes(it.category) ? `${it.details.subscriptionName||''} / ${it.details.resourceGroup||''}`
     : it.details.appId ? `appId ${it.details.appId}` : it.id;
   return `<details class="row" data-cat="${esc(it.category)}" data-status="${esc(it.status)}" data-text="${esc((it.name+' '+it.id+' '+(it.details.appId||'')+' '+(it.owners||[]).map(o=>o.displayName+' '+(o.upn||'')).join(' ')+' '+(it.reasons||[]).join(' ')).toLowerCase())}">
   <summary><span><span class="pill sev-${esc(it.severity)}">${esc(it.severity)}</span></span>
-    <span><div class="name">${esc(it.name)}</div><div class="sub">${esc(CAT[it.category])} · ${esc(sub)} · action: <b>${esc(it.action)}</b></div></span>
+    <span><div class="name">${esc(it.name)}${it.irreversible?'<span class="irrev">IRREVERSIBLE</span>':''}</div><div class="sub">${esc(CAT[it.category])} · ${esc(sub)} · action: <b>${esc(it.action)}</b></div></span>
     <span class="pill st-${esc(it.status)}">${esc(it.status)}</span></summary>
   <div class="body">
     <div><h4>Why</h4><div class="chips">${(it.reasons||[]).map(r=>`<span class="chip">${esc(r)}</span>`).join('')}</div>
@@ -1199,7 +1677,7 @@ const statuses = [...new Set(items.map(i=>i.status))].sort();
 
 app.innerHTML = `
 <div class="banner ${bannerCls}"><span>${esc(bannerTxt)}</span><small>run ${esc(R.run.id.slice(0,8))}${R.run.sourceRunId?' · reverts '+esc(R.run.sourceRunId.slice(0,8)):''} <button class="theme" id="theme">◐ theme</button></small></div>
-<h1>Emergency lockdown report</h1>
+<h1>SHUTTER — Emergency containment report</h1>
 <div class="meta">
   <span>Tenant <code>${esc(R.run.tenantId)}</code></span>
   <span>Operator <b>${esc(R.run.operator?.upn)}</b> (${esc(R.run.operator?.kind)})</span>
@@ -1212,7 +1690,7 @@ app.innerHTML = `
 <h2>Objects</h2>
 <div class="toolbar" role="group" aria-label="Category">
   <button class="tab" data-cat="" aria-pressed="true">All (${items.length})</button>
-  ${Object.entries(CAT).map(([k,v])=>`<button class="tab" data-cat="${k}" aria-pressed="false">${esc(v)} (${count(i=>i.category===k)})</button>`).join('')}
+  ${Object.entries(CAT).filter(([k])=>count(i=>i.category===k)).map(([k,v])=>`<button class="tab" data-cat="${k}" aria-pressed="false">${esc(v)} (${count(i=>i.category===k)})</button>`).join('')}
 </div>
 <div class="toolbar">
   <input type="search" id="q" placeholder="Search name, appId, owner, permission…">
@@ -1220,7 +1698,7 @@ app.innerHTML = `
   <button class="tab" id="expand" aria-pressed="false">Expand all</button>
 </div>
 <div class="panel" id="list">${sorted.map(row).join('')}<div class="empty" id="empty" hidden>No objects match the filters</div></div>
-<div class="foot"><span>Rollback: <code>python -m persiana rollback report.json</code> (dry-run) · add <code>--execute</code> to revert</span><span>Generated by persiana</span></div>`;
+<div class="foot"><span>Rollback: <code>python -m shutter rollback report.json</code> (dry-run) · add <code>--execute</code> to revert</span><span>Generated by SHUTTER — Azure Emergency Containment &amp; Recovery</span></div>`;
 
 let cat='';
 const apply=()=>{const q=document.getElementById('q').value.toLowerCase(),st=document.getElementById('st').value;let n=0;
