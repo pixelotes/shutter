@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Persiana Report</title>
+<style>
+:root{
+  --bg:#f6f7f9;--panel:#fff;--ink:#16191f;--muted:#5d6675;--line:#e3e6eb;--chip:#eef0f4;
+  --crit:#b42318;--crit-bg:#fdecea;--high:#b54708;--high-bg:#fef0e1;--med:#8a6d00;--med-bg:#fdf6d8;
+  --ok:#067647;--ok-bg:#e3f6ec;--info:#1d4ed8;--info-bg:#e6eeff;--gray-bg:#eef0f4;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1115;--panel:#171a21;--ink:#e8eaee;--muted:#9aa3b2;--line:#2a2f3a;--chip:#232833;
+  --crit:#ff8a7a;--crit-bg:#3a1714;--high:#ffb26b;--high-bg:#3a2410;--med:#e8cb5a;--med-bg:#332b0c;
+  --ok:#5ad19a;--ok-bg:#0f2e20;--info:#8fb0ff;--info-bg:#16223f;--gray-bg:#232833;}}
+:root[data-theme="dark"]{
+  --bg:#0f1115;--panel:#171a21;--ink:#e8eaee;--muted:#9aa3b2;--line:#2a2f3a;--chip:#232833;
+  --crit:#ff8a7a;--crit-bg:#3a1714;--high:#ffb26b;--high-bg:#3a2410;--med:#e8cb5a;--med-bg:#332b0c;
+  --ok:#5ad19a;--ok-bg:#0f2e20;--info:#8fb0ff;--info-bg:#16223f;--gray-bg:#232833;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 16px 64px}
+.banner{border-radius:12px;padding:14px 18px;font-weight:700;letter-spacing:.04em;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.banner.dry{background:var(--info-bg);color:var(--info)}
+.banner.exec{background:var(--crit-bg);color:var(--crit)}
+.banner.roll{background:var(--ok-bg);color:var(--ok)}
+.banner.refused{background:var(--gray-bg);color:var(--muted)}
+.banner small{font-weight:500;letter-spacing:0}
+h1{font-size:26px;margin:22px 0 4px}
+h2{font-size:17px;margin:32px 0 12px}
+.meta{color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px}
+.meta code{font-family:var(--mono);font-size:12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi .n{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .l{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.checks{list-style:none;margin:0;padding:6px 0}
+.checks li{display:flex;gap:10px;padding:8px 16px;border-top:1px solid var(--line)}
+.checks li:first-child{border-top:0}
+.checks .ic{width:20px;flex:none;font-weight:700}
+.checks .d{color:var(--muted);font-size:13px;word-break:break-word}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit;font-size:13px}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input[type=search],select{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 10px;font:inherit;font-size:13px}
+input[type=search]{flex:1;min-width:180px}
+.row{border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;padding:12px 16px}
+.row summary::-webkit-details-marker{display:none}
+.row summary:hover{background:var(--chip)}
+.name{font-weight:600;word-break:break-word}
+.sub{color:var(--muted);font-size:12px}
+.pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600;white-space:nowrap}
+.sev-critical{background:var(--crit-bg);color:var(--crit)}
+.sev-high{background:var(--high-bg);color:var(--high)}
+.sev-medium{background:var(--med-bg);color:var(--med)}
+.sev-low{background:var(--gray-bg);color:var(--muted)}
+.st-applied,.st-reverted{background:var(--ok-bg);color:var(--ok)}
+.st-planned{background:var(--info-bg);color:var(--info)}
+.st-failed,.st-drift{background:var(--crit-bg);color:var(--crit)}
+.st-skipped,.st-skipped-allowlist,.st-covered,.st-report-only,.st-not-applicable{background:var(--gray-bg);color:var(--muted)}
+.body{padding:4px 16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.body h4{margin:8px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--chip);border-radius:6px;padding:3px 8px;font-size:12px}
+.chip b{font-weight:600}
+.chip.c-critical{background:var(--crit-bg);color:var(--crit)}
+.chip.c-high{background:var(--high-bg);color:var(--high)}
+table.kv{border-collapse:collapse;width:100%;font-size:13px}
+table.kv td{padding:3px 0;vertical-align:top;border-bottom:1px dashed var(--line)}
+table.kv td:first-child{color:var(--muted);width:42%;padding-right:10px}
+pre{background:var(--chip);border-radius:8px;padding:10px;font:12px/1.45 var(--mono);overflow:auto;max-height:260px;margin:0}
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.full{grid-column:1/-1}
+.err{color:var(--crit);font-family:var(--mono);font-size:12px;word-break:break-word}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.foot{margin-top:40px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+button.theme{background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:4px 10px;cursor:pointer;font:inherit;font-size:12px}
+@media (max-width:720px){
+  .row summary{grid-template-columns:1fr;gap:6px}
+  .body,.diff{grid-template-columns:1fr}
+}
+@media print{.toolbar,button.theme{display:none}details{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script id="report-data" type="application/json">/*__REPORT_JSON__*/null</script>
+<script>
+(function(){
+const R = JSON.parse(document.getElementById('report-data').textContent);
+const app = document.getElementById('app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const CAT = {'conditional-access':'Conditional Access','sftp':'SFTP storage','service-principal':'Enterprise apps','app-registration':'App registrations'};
+const SEV = {critical:0,high:1,medium:2,low:3};
+const mode = R.run.mode;
+const bannerCls = mode.startsWith('rollback') ? (mode.includes('refused')||mode.includes('aborted')?'refused':'roll')
+  : mode==='execute' ? 'exec' : (mode.includes('refused')||mode.includes('aborted')) ? 'refused' : 'dry';
+const bannerTxt = {
+  'dry-run':'DRY RUN — nothing was changed','preflight':'PREFLIGHT ONLY — nothing was changed',
+  'execute':'EXECUTED — production was changed','execute-refused':'EXECUTION REFUSED — preflight failed, nothing changed',
+  'execute-aborted':'EXECUTION ABORTED — confirmation mismatch, nothing changed',
+  'rollback-dry-run':'ROLLBACK DRY RUN — nothing was changed','rollback-execute':'ROLLBACK EXECUTED',
+  'rollback-refused':'ROLLBACK REFUSED — preflight failed','rollback-aborted':'ROLLBACK ABORTED — confirmation mismatch'}[mode] || mode.toUpperCase();
+const fmt = d => d ? new Date(d).toLocaleString() : '—';
+const items = R.items;
+const count = f => items.filter(f).length;
+const actionable = i => !['skipped-allowlist','covered','not-applicable'].includes(i.status);
+
+function kv(obj){
+  const rows = Object.entries(obj||{}).filter(([k,v]) => v!==null && v!==undefined && v!=='' && !(Array.isArray(v)&&!v.length) && typeof v!=='object' || (Array.isArray(v) && v.length && typeof v[0]!=='object'));
+  if(!rows.length) return '';
+  return '<table class="kv">'+rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(Array.isArray(v)?v.join(', '):typeof v==='boolean'?(v?'yes':'no'):(/DateTime$|^lastSignIn$/.test(k)?fmt(v):v))}</td></tr>`).join('')+'</table>';
+}
+function perms(list){
+  if(!list?.length) return '';
+  const low = new Set(['Directory.Read.All','User.Read.All','Sites.Read.All','Files.Read.All','Mail.Read']);
+  return '<h4>Permissions</h4><div class="chips">'+list.map(p=>{
+    const sev = (p.type==='directory-role'&&p.privileged)||(p.type==='azure-rbac'&&/Owner|User Access/.test(p.value)) ? 'critical' : low.has(p.value)?'':'high';
+    const where = p.scopeName ? ` @ ${p.scopeName}` : '';
+    return `<span class="chip c-${sev}" title="${esc(p.type)}${p.scope?' · '+esc(p.scope):''}"><b>${esc(p.value)}</b> · ${esc(p.resource)}${esc(where)} <span class="sub">(${esc(p.type)})</span></span>`;}).join('')+'</div>';
+}
+function owners(list){
+  return '<h4>Owners / contacts</h4>'+(list?.length ? '<div class="chips">'+list.map(o=>`<span class="chip"><b>${esc(o.displayName||o.id)}</b>${o.upn?' · '+esc(o.upn):''}${o.type?` <span class="sub">${esc(o.type)}</span>`:''}</span>`).join('')+'</div>'
+    : '<div class="sub" style="color:var(--crit)">No owner found — orphaned object</div>');
+}
+function creds(list){
+  if(!list?.length) return '';
+  return '<h4>Credentials</h4><div class="chips">'+list.map(c=>`<span class="chip ${c.active?'c-high':''}">${esc(c.kind)}${c.name?' “'+esc(c.name)+'”':''} · expires ${esc(c.end?.slice(0,10)||'—')}${c.active?' · <b>active</b>':''}</span>`).join('')+'</div>';
+}
+function extra(it){
+  const d = it.details||{}; let h='';
+  if(d.excludedUsers) h += '<h4>Excluded (break-glass)</h4><div class="chips">'+d.excludedUsers.map(u=>`<span class="chip">${esc(u.displayName||u.id)} · ${esc(u.upn||'')}</span>`).join('')+'</div>';
+  if(d.currentExternalTenants) h += '<h4>External tenants in scope (before)</h4><pre>'+esc(JSON.stringify(d.currentExternalTenants,null,2))+'</pre>';
+  if(d.localUsers?.length) h += '<h4>SFTP local users</h4><div class="chips">'+d.localUsers.map(u=>`<span class="chip">${esc(u)}</span>`).join('')+'</div>';
+  if(d.tags && Object.keys(d.tags).length) h += '<h4>Tags</h4><div class="chips">'+Object.entries(d.tags).map(([k,v])=>`<span class="chip"><b>${esc(k)}</b>=${esc(v)}</span>`).join('')+'</div>';
+  return h;
+}
+function stateBox(it){
+  if(!it.before && !it.after) return '';
+  const show = o => esc(JSON.stringify(it.category==='conditional-access' && o ? {state:o.state, users:o.conditions?.users} : o, null, 2));
+  return `<div class="full"><h4>State change</h4><div class="diff"><div><div class="sub">before</div><pre>${show(it.before)}</pre></div><div><div class="sub">after</div><pre>${show(it.after)}</pre></div></div></div>`;
+}
+function row(it){
+  const sub = it.category==='sftp' ? `${it.details.subscriptionName||''} / ${it.details.resourceGroup||''}`
+    : it.details.appId ? `appId ${it.details.appId}` : it.id;
+  return `<details class="row" data-cat="${esc(it.category)}" data-status="${esc(it.status)}" data-text="${esc((it.name+' '+it.id+' '+(it.details.appId||'')+' '+(it.owners||[]).map(o=>o.displayName+' '+(o.upn||'')).join(' ')+' '+(it.reasons||[]).join(' ')).toLowerCase())}">
+  <summary><span><span class="pill sev-${esc(it.severity)}">${esc(it.severity)}</span></span>
+    <span><div class="name">${esc(it.name)}</div><div class="sub">${esc(CAT[it.category])} · ${esc(sub)} · action: <b>${esc(it.action)}</b></div></span>
+    <span class="pill st-${esc(it.status)}">${esc(it.status)}</span></summary>
+  <div class="body">
+    <div><h4>Why</h4><div class="chips">${(it.reasons||[]).map(r=>`<span class="chip">${esc(r)}</span>`).join('')}</div>
+      ${perms(it.permissions)}${owners(it.owners)}${creds(it.details.credentials)}
+      ${it.error?`<h4>Error</h4><div class="err">${esc(it.error)}</div>`:''}</div>
+    <div><h4>Details</h4>${kv(Object.assign({id:it.id}, it.details))}${extra(it)}</div>
+    ${stateBox(it)}
+  </div></details>`;
+}
+
+const pf = R.preflight||{checks:[]};
+const kpis = [
+  ['Items found', items.length],
+  [mode.startsWith('rollback')?'Reverted':'Applied', count(i=>i.status==='applied'||i.status==='reverted')],
+  ['Planned', count(i=>i.status==='planned')],
+  ['Critical', count(i=>i.severity==='critical'&&actionable(i))],
+  ['Failed / drift', count(i=>i.status==='failed'||i.status==='drift')],
+  ['Allowlisted', count(i=>i.status==='skipped-allowlist')],
+];
+const sorted = [...items].sort((a,b)=>(SEV[a.severity]-SEV[b.severity])||a.name.localeCompare(b.name));
+const statuses = [...new Set(items.map(i=>i.status))].sort();
+
+app.innerHTML = `
+<div class="banner ${bannerCls}"><span>${esc(bannerTxt)}</span><small>run ${esc(R.run.id.slice(0,8))}${R.run.sourceRunId?' · reverts '+esc(R.run.sourceRunId.slice(0,8)):''} <button class="theme" id="theme">◐ theme</button></small></div>
+<h1>Emergency lockdown report</h1>
+<div class="meta">
+  <span>Tenant <code>${esc(R.run.tenantId)}</code></span>
+  <span>Operator <b>${esc(R.run.operator?.upn)}</b> (${esc(R.run.operator?.kind)})</span>
+  <span>Started ${esc(fmt(R.run.startedAt))}</span><span>Finished ${esc(fmt(R.run.finishedAt))}</span>
+  <span>${esc(R.tool.name)} ${esc(R.tool.version)} · config <code>${esc((R.run.configSha256||'').slice(0,12))}</code></span>
+</div>
+<div class="kpis">${kpis.map(([l,n])=>`<div class="kpi"><div class="n">${n}</div><div class="l">${esc(l)}</div></div>`).join('')}</div>
+<h2>Preflight ${pf.ok?'<span class="pill st-applied">passed</span>':'<span class="pill st-failed">failed</span>'}</h2>
+<div class="panel"><ul class="checks">${pf.checks.map(c=>`<li><span class="ic" style="color:var(${c.ok?'--ok':'--crit'})">${c.ok?'✔':'✘'}</span><span><div>${esc(c.name)}</div><div class="d">${esc(c.detail)}</div></span></li>`).join('')||'<li>No checks recorded</li>'}</ul></div>
+<h2>Objects</h2>
+<div class="toolbar" role="group" aria-label="Category">
+  <button class="tab" data-cat="" aria-pressed="true">All (${items.length})</button>
+  ${Object.entries(CAT).map(([k,v])=>`<button class="tab" data-cat="${k}" aria-pressed="false">${esc(v)} (${count(i=>i.category===k)})</button>`).join('')}
+</div>
+<div class="toolbar">
+  <input type="search" id="q" placeholder="Search name, appId, owner, permission…">
+  <select id="st"><option value="">All statuses</option>${statuses.map(s=>`<option>${esc(s)}</option>`).join('')}</select>
+  <button class="tab" id="expand" aria-pressed="false">Expand all</button>
+</div>
+<div class="panel" id="list">${sorted.map(row).join('')}<div class="empty" id="empty" hidden>No objects match the filters</div></div>
+<div class="foot"><span>Rollback: <code>python -m persiana rollback report.json</code> (dry-run) · add <code>--execute</code> to revert</span><span>Generated by persiana</span></div>`;
+
+let cat='';
+const apply=()=>{const q=document.getElementById('q').value.toLowerCase(),st=document.getElementById('st').value;let n=0;
+  document.querySelectorAll('.row').forEach(r=>{const ok=(!cat||r.dataset.cat===cat)&&(!st||r.dataset.status===st)&&(!q||r.dataset.text.includes(q));r.hidden=!ok;n+=ok;});
+  document.getElementById('empty').hidden=n>0;};
+document.querySelectorAll('.tab[data-cat]').forEach(b=>b.onclick=()=>{cat=b.dataset.cat;document.querySelectorAll('.tab[data-cat]').forEach(x=>x.setAttribute('aria-pressed',x===b));apply();});
+document.getElementById('q').oninput=apply;document.getElementById('st').onchange=apply;
+document.getElementById('expand').onclick=e=>{const on=e.target.getAttribute('aria-pressed')!=='true';e.target.setAttribute('aria-pressed',on);e.target.textContent=on?'Collapse all':'Expand all';document.querySelectorAll('.row').forEach(r=>r.open=on);};
+document.getElementById('theme').onclick=()=>{const d=document.documentElement,cur=d.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');d.dataset.theme=cur==='dark'?'light':'dark';};
+})();
+</script>
+</body>
+</html>

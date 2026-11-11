@@ -1,0 +1,1025 @@
+{
+  "schema": 1,
+  "tool": {
+    "name": "persiana",
+    "version": "0.1.0"
+  },
+  "run": {
+    "id": "885e7ba5-6e94-4246-b20f-03fed70ce6df",
+    "mode": "rollback-execute",
+    "startedAt": "2026-11-11T12:07:31+00:00",
+    "finishedAt": "2026-11-11T12:07:31+00:00",
+    "operator": {
+      "kind": "user",
+      "id": "00000006-c0de-4c0d-9e00-000000000006",
+      "upn": "alexw@contoso.com",
+      "appId": null
+    },
+    "tenantId": "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
+    "configSha256": "3b3533a4d4473a0bf24910cda22d42953dba39838fd447e1ed9d3c0b75f944df",
+    "sourceRunId": "4320bf8d-75b8-43c1-a383-7af399050db8"
+  },
+  "preflight": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "Report tenant matches token",
+        "ok": true,
+        "detail": "report=8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f token=8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
+        "blocking": true
+      },
+      {
+        "name": "Graph permissions for conditional-access",
+        "ok": true,
+        "detail": "ok: Policy.Read.All, Policy.ReadWrite.ConditionalAccess",
+        "blocking": true
+      },
+      {
+        "name": "Graph permissions for service-principal",
+        "ok": true,
+        "detail": "ok: Application.ReadWrite.All",
+        "blocking": true
+      },
+      {
+        "name": "Graph permissions for inventory",
+        "ok": true,
+        "detail": "ok: Directory.Read.All",
+        "blocking": true
+      },
+      {
+        "name": "Active Entra role for Conditional Access",
+        "ok": true,
+        "detail": "needs CA Admin / Security Admin / Global Admin (PIM must be ACTIVE). Active: Global Administrator",
+        "blocking": true
+      },
+      {
+        "name": "Active Entra role for applications",
+        "ok": true,
+        "detail": "needs Cloud App Admin / App Admin / Global Admin (PIM must be ACTIVE). Active: Global Administrator",
+        "blocking": true
+      },
+      {
+        "name": "Microsoft.Storage/storageAccounts/write on 3 SFTP storage account(s)",
+        "ok": true,
+        "detail": "ok",
+        "blocking": true
+      }
+    ]
+  },
+  "items": [
+    {
+      "key": "app-registration:0000012c-c0de-4c0d-9e00-00000000012c",
+      "category": "app-registration",
+      "id": "0000012c-c0de-4c0d-9e00-00000000012c",
+      "name": "Contoso HR Sync",
+      "action": "see-service-principal",
+      "severity": "high",
+      "reasons": [
+        "application (requested): Group.ReadWrite.All",
+        "application (requested): User.ReadWrite.All"
+      ],
+      "permissions": [
+        {
+          "type": "application (requested)",
+          "resource": "Microsoft Graph",
+          "value": "User.ReadWrite.All"
+        },
+        {
+          "type": "application (requested)",
+          "resource": "Microsoft Graph",
+          "value": "Group.ReadWrite.All"
+        }
+      ],
+      "owners": [
+        {
+          "id": "00000004-c0de-4c0d-9e00-000000000004",
+          "displayName": "Adele Vance",
+          "upn": "adelev@contoso.com",
+          "type": "user"
+        }
+      ],
+      "details": {
+        "appId": "000023f0-c0de-4c0d-9e00-0000000023f0",
+        "signInAudience": "AzureADMyOrg",
+        "multiTenant": false,
+        "credentials": [
+          {
+            "kind": "secret",
+            "name": "prod-2026",
+            "hint": "Q~7",
+            "start": "2026-01-10T00:00:00Z",
+            "end": "2027-01-10T00:00:00Z",
+            "active": true
+          }
+        ],
+        "activeCredentials": 1,
+        "createdDateTime": "2022-06-01T09:58:00Z",
+        "publisherDomain": "contoso.com",
+        "notes": "Workday → Entra user sync",
+        "servicePrincipalId": "000000c8-c0de-4c0d-9e00-0000000000c8",
+        "coveredBy": "service-principal:000000c8-c0de-4c0d-9e00-0000000000c8"
+      },
+      "before": null,
+      "after": null,
+      "status": "not-applicable",
+      "error": null,
+      "revertOf": "covered"
+    },
+    {
+      "key": "app-registration:0000012d-c0de-4c0d-9e00-00000000012d",
+      "category": "app-registration",
+      "id": "0000012d-c0de-4c0d-9e00-00000000012d",
+      "name": "Terraform Deployer",
+      "action": "see-service-principal",
+      "severity": "high",
+      "reasons": [
+        "application (requested): Application.ReadWrite.All"
+      ],
+      "permissions": [
+        {
+          "type": "application (requested)",
+          "resource": "Microsoft Graph",
+          "value": "Application.ReadWrite.All"
+        }
+      ],
+      "owners": [
+        {
+          "id": "00000005-c0de-4c0d-9e00-000000000005",
+          "displayName": "Lee Gu",
+          "upn": "leeg@contoso.com",
+          "type": "user"
+        },
+        {
+          "id": "00000006-c0de-4c0d-9e00-000000000006",
+          "displayName": "Alex Wilber",
+          "upn": "alexw@contoso.com",
+          "type": "user"
+        }
+      ],
+      "details": {
+        "appId": "000023f2-c0de-4c0d-9e00-0000000023f2",
+        "signInAudience": "AzureADMyOrg",
+        "multiTenant": false,
+        "credentials": [
+          {
+            "kind": "certificate",
+            "name": "CN=tf-deployer",
+            "start": "2025-12-01T00:00:00Z",
+            "end": "2027-12-01T00:00:00Z",
+            "active": true
+          }
+        ],
+        "activeCredentials": 1,
+        "createdDateTime": "2024-01-09T08:29:00Z",
+        "publisherDomain": "contoso.com",
+        "notes": null,
+        "servicePrincipalId": "000000ca-c0de-4c0d-9e00-0000000000ca",
+        "coveredBy": "service-principal:000000ca-c0de-4c0d-9e00-0000000000ca"
+      },
+      "before": null,
+      "after": null,
+      "status": "not-applicable",
+      "error": null,
+      "revertOf": "covered"
+    },
+    {
+      "key": "app-registration:0000012e-c0de-4c0d-9e00-00000000012e",
+      "category": "app-registration",
+      "id": "0000012e-c0de-4c0d-9e00-00000000012e",
+      "name": "Contoso Reporting API",
+      "action": "disable-service-principal",
+      "severity": "medium",
+      "reasons": [
+        "application (requested): Directory.Read.All",
+        "No active credentials (lower risk)"
+      ],
+      "permissions": [
+        {
+          "type": "application (requested)",
+          "resource": "Microsoft Graph",
+          "value": "Directory.Read.All"
+        }
+      ],
+      "owners": [],
+      "details": {
+        "appId": "000023f8-c0de-4c0d-9e00-0000000023f8",
+        "signInAudience": "AzureADMyOrg",
+        "multiTenant": false,
+        "credentials": [
+          {
+            "kind": "secret",
+            "name": "old",
+            "hint": "x9P",
+            "start": "2021-02-03T00:00:00Z",
+            "end": "2023-02-03T00:00:00Z",
+            "active": false
+          }
+        ],
+        "activeCredentials": 0,
+        "createdDateTime": "2021-02-03T08:55:00Z",
+        "publisherDomain": "contoso.com",
+        "notes": "PowerBI exports",
+        "servicePrincipalId": "000000d0-c0de-4c0d-9e00-0000000000d0"
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "app-registration:0000012f-c0de-4c0d-9e00-00000000012f",
+      "category": "app-registration",
+      "id": "0000012f-c0de-4c0d-9e00-00000000012f",
+      "name": "Old Migration Script",
+      "action": "report-only",
+      "severity": "high",
+      "reasons": [
+        "application (requested): RoleManagement.ReadWrite.Directory",
+        "delegated (requested): Directory.AccessAsUser.All",
+        "No service principal in this tenant: nothing to disable here — multi-tenant app may still be used in other tenants"
+      ],
+      "permissions": [
+        {
+          "type": "application (requested)",
+          "resource": "Microsoft Graph",
+          "value": "RoleManagement.ReadWrite.Directory"
+        },
+        {
+          "type": "delegated (requested)",
+          "resource": "Microsoft Graph",
+          "value": "Directory.AccessAsUser.All"
+        }
+      ],
+      "owners": [],
+      "details": {
+        "appId": "00002457-c0de-4c0d-9e00-000000002457",
+        "signInAudience": "AzureADMultipleOrgs",
+        "multiTenant": true,
+        "credentials": [
+          {
+            "kind": "secret",
+            "name": "migration",
+            "hint": "a1B",
+            "start": "2020-05-12T00:00:00Z",
+            "end": "2030-05-12T00:00:00Z",
+            "active": true
+          }
+        ],
+        "activeCredentials": 1,
+        "createdDateTime": "2020-05-12T15:00:00Z",
+        "publisherDomain": "contoso.com",
+        "notes": "Tenant-to-tenant migration 2020",
+        "servicePrincipalId": null
+      },
+      "before": null,
+      "after": null,
+      "status": "not-applicable",
+      "error": null,
+      "revertOf": "report-only"
+    },
+    {
+      "key": "app-registration:00000130-c0de-4c0d-9e00-000000000130",
+      "category": "app-registration",
+      "id": "00000130-c0de-4c0d-9e00-000000000130",
+      "name": "Sentinel-Playbook-Isolate-User",
+      "action": "none",
+      "severity": "medium",
+      "reasons": [
+        "application (requested): User.ReadWrite.All",
+        "In persiana.toml allowlist"
+      ],
+      "permissions": [
+        {
+          "type": "application (requested)",
+          "resource": "Microsoft Graph",
+          "value": "User.ReadWrite.All"
+        }
+      ],
+      "owners": [
+        {
+          "id": "00000006-c0de-4c0d-9e00-000000000006",
+          "displayName": "Alex Wilber",
+          "upn": "alexw@contoso.com",
+          "type": "user"
+        }
+      ],
+      "details": {
+        "appId": "3a9e7c51-0b2d-4f6e-8a1c-5d7e9b3f0a24",
+        "signInAudience": "AzureADMyOrg",
+        "multiTenant": false,
+        "credentials": [],
+        "activeCredentials": 0,
+        "createdDateTime": "2026-02-11T14:19:00Z",
+        "publisherDomain": "contoso.com",
+        "notes": null,
+        "servicePrincipalId": "000000cc-c0de-4c0d-9e00-0000000000cc"
+      },
+      "before": null,
+      "after": null,
+      "status": "not-applicable",
+      "error": null,
+      "revertOf": "skipped-allowlist"
+    },
+    {
+      "key": "service-principal:000000c9-c0de-4c0d-9e00-0000000000c9",
+      "category": "service-principal",
+      "id": "000000c9-c0de-4c0d-9e00-0000000000c9",
+      "name": "Legacy Backup Tool",
+      "action": "disable-service-principal",
+      "severity": "high",
+      "reasons": [
+        "application: Files.ReadWrite.All",
+        "application: Mail.ReadWrite",
+        "application: Sites.FullControl.All"
+      ],
+      "permissions": [
+        {
+          "type": "application",
+          "resource": "Office 365 SharePoint Online",
+          "value": "Sites.FullControl.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        },
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "Mail.ReadWrite",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        },
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "Files.ReadWrite.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        }
+      ],
+      "owners": [],
+      "details": {
+        "appId": "000023f1-c0de-4c0d-9e00-0000000023f1",
+        "servicePrincipalType": "Application",
+        "publisher": "Northwind Traders",
+        "verifiedPublisher": null,
+        "ownerTenantId": "a7d1e3f5-9b2c-4d6e-8f0a-1c3e5a7b9d2f",
+        "homeTenant": false,
+        "createdDateTime": "2019-11-20T16:45:00Z",
+        "lastSignIn": "2026-11-10T23:41:00Z"
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "service-principal:000000c8-c0de-4c0d-9e00-0000000000c8",
+      "category": "service-principal",
+      "id": "000000c8-c0de-4c0d-9e00-0000000000c8",
+      "name": "Contoso HR Sync",
+      "action": "disable-service-principal",
+      "severity": "high",
+      "reasons": [
+        "application: Group.ReadWrite.All",
+        "application: User.ReadWrite.All"
+      ],
+      "permissions": [
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "User.ReadWrite.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        },
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "Group.ReadWrite.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        }
+      ],
+      "owners": [
+        {
+          "id": "00000004-c0de-4c0d-9e00-000000000004",
+          "displayName": "Adele Vance",
+          "upn": "adelev@contoso.com",
+          "type": "user"
+        },
+        {
+          "id": "00000004-c0de-4c0d-9e00-000000000004",
+          "displayName": "Adele Vance",
+          "upn": "adelev@contoso.com",
+          "type": "app-registration user"
+        }
+      ],
+      "details": {
+        "appId": "000023f0-c0de-4c0d-9e00-0000000023f0",
+        "servicePrincipalType": "Application",
+        "publisher": "Contoso",
+        "verifiedPublisher": null,
+        "ownerTenantId": "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
+        "homeTenant": true,
+        "createdDateTime": "2022-06-01T10:00:00Z",
+        "lastSignIn": "2026-11-11T06:02:00Z"
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "service-principal:000000ca-c0de-4c0d-9e00-0000000000ca",
+      "category": "service-principal",
+      "id": "000000ca-c0de-4c0d-9e00-0000000000ca",
+      "name": "Terraform Deployer",
+      "action": "disable-service-principal",
+      "severity": "critical",
+      "reasons": [
+        "application: Application.ReadWrite.All",
+        "azure-rbac: Owner",
+        "Already back to original state"
+      ],
+      "permissions": [
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "Application.ReadWrite.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        },
+        {
+          "type": "azure-rbac",
+          "resource": "Azure",
+          "value": "Owner",
+          "scope": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
+          "scopeName": "Contoso Production"
+        }
+      ],
+      "owners": [
+        {
+          "id": "00000005-c0de-4c0d-9e00-000000000005",
+          "displayName": "Lee Gu",
+          "upn": "leeg@contoso.com",
+          "type": "user"
+        },
+        {
+          "id": "00000005-c0de-4c0d-9e00-000000000005",
+          "displayName": "Lee Gu",
+          "upn": "leeg@contoso.com",
+          "type": "app-registration user"
+        },
+        {
+          "id": "00000006-c0de-4c0d-9e00-000000000006",
+          "displayName": "Alex Wilber",
+          "upn": "alexw@contoso.com",
+          "type": "app-registration user"
+        }
+      ],
+      "details": {
+        "appId": "000023f2-c0de-4c0d-9e00-0000000023f2",
+        "servicePrincipalType": "Application",
+        "publisher": "Contoso",
+        "verifiedPublisher": null,
+        "ownerTenantId": "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
+        "homeTenant": true,
+        "createdDateTime": "2024-01-09T08:30:00Z",
+        "lastSignIn": "2026-11-09T15:20:00Z"
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "skipped",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "service-principal:000000cb-c0de-4c0d-9e00-0000000000cb",
+      "category": "service-principal",
+      "id": "000000cb-c0de-4c0d-9e00-0000000000cb",
+      "name": "Fabrikam Partner Portal",
+      "action": "disable-service-principal",
+      "severity": "high",
+      "reasons": [
+        "delegated-all-users: Directory.AccessAsUser.All",
+        "delegated-all-users: Mail.Send"
+      ],
+      "permissions": [
+        {
+          "type": "delegated-all-users",
+          "resource": "Microsoft Graph",
+          "value": "Directory.AccessAsUser.All"
+        },
+        {
+          "type": "delegated-all-users",
+          "resource": "Microsoft Graph",
+          "value": "Mail.Send"
+        }
+      ],
+      "owners": [],
+      "details": {
+        "appId": "000023f3-c0de-4c0d-9e00-0000000023f3",
+        "servicePrincipalType": "Application",
+        "publisher": "Fabrikam, Inc.",
+        "verifiedPublisher": "Fabrikam, Inc.",
+        "ownerTenantId": "5e2a9c41-7d3b-4f10-8a66-2c9e1b7d0f33",
+        "homeTenant": false,
+        "createdDateTime": "2025-04-02T12:00:00Z",
+        "lastSignIn": "2026-11-11T08:55:00Z"
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "service-principal:000000cf-c0de-4c0d-9e00-0000000000cf",
+      "category": "service-principal",
+      "id": "000000cf-c0de-4c0d-9e00-0000000000cf",
+      "name": "Contoso Helpdesk Bot",
+      "action": "disable-service-principal",
+      "severity": "critical",
+      "reasons": [
+        "directory-role: User Administrator"
+      ],
+      "permissions": [
+        {
+          "type": "directory-role",
+          "resource": "Entra ID",
+          "value": "User Administrator",
+          "privileged": true,
+          "scope": "/"
+        }
+      ],
+      "owners": [
+        {
+          "id": "00000007-c0de-4c0d-9e00-000000000007",
+          "displayName": "Diego Siciliani",
+          "upn": "diegos@contoso.com",
+          "type": "user"
+        }
+      ],
+      "details": {
+        "appId": "000023f7-c0de-4c0d-9e00-0000000023f7",
+        "servicePrincipalType": "Application",
+        "publisher": "Contoso",
+        "verifiedPublisher": null,
+        "ownerTenantId": "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
+        "homeTenant": true,
+        "createdDateTime": "2025-08-18T11:05:00Z",
+        "lastSignIn": "2026-11-11T09:12:00Z"
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "not-applicable",
+      "error": "PATCH /v1.0/servicePrincipals/000000cf-c0de-4c0d-9e00-0000000000cf -> HTTP 403: {\"error\":{\"code\":\"Authorization_RequestDenied\",\"message\":\"Insufficient privileges to complete the operation.\"}}",
+      "revertOf": "failed"
+    },
+    {
+      "key": "service-principal:000000ce-c0de-4c0d-9e00-0000000000ce",
+      "category": "service-principal",
+      "id": "000000ce-c0de-4c0d-9e00-0000000000ce",
+      "name": "mi-automation-prod",
+      "action": "report-only",
+      "severity": "high",
+      "reasons": [
+        "azure-rbac: Contributor",
+        "Managed identity: cannot be disabled via Graph — remove its role assignments or the identity itself manually"
+      ],
+      "permissions": [
+        {
+          "type": "azure-rbac",
+          "resource": "Azure",
+          "value": "Contributor",
+          "scope": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
+          "scopeName": "Contoso Production"
+        }
+      ],
+      "owners": [],
+      "details": {
+        "appId": "000023f6-c0de-4c0d-9e00-0000000023f6",
+        "servicePrincipalType": "ManagedIdentity",
+        "publisher": null,
+        "verifiedPublisher": null,
+        "ownerTenantId": null,
+        "homeTenant": false,
+        "createdDateTime": "2024-09-30T07:00:00Z",
+        "lastSignIn": null
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "not-applicable",
+      "error": null,
+      "revertOf": "report-only"
+    },
+    {
+      "key": "service-principal:000000cc-c0de-4c0d-9e00-0000000000cc",
+      "category": "service-principal",
+      "id": "000000cc-c0de-4c0d-9e00-0000000000cc",
+      "name": "Sentinel-Playbook-Isolate-User",
+      "action": "none",
+      "severity": "high",
+      "reasons": [
+        "application: User.ReadWrite.All",
+        "In persiana.toml allowlist"
+      ],
+      "permissions": [
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "User.ReadWrite.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        }
+      ],
+      "owners": [
+        {
+          "id": "00000006-c0de-4c0d-9e00-000000000006",
+          "displayName": "Alex Wilber",
+          "upn": "alexw@contoso.com",
+          "type": "app-registration user"
+        }
+      ],
+      "details": {
+        "appId": "3a9e7c51-0b2d-4f6e-8a1c-5d7e9b3f0a24",
+        "servicePrincipalType": "Application",
+        "publisher": "Contoso",
+        "verifiedPublisher": null,
+        "ownerTenantId": "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
+        "homeTenant": true,
+        "createdDateTime": "2026-02-11T14:20:00Z",
+        "lastSignIn": null
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "not-applicable",
+      "error": null,
+      "revertOf": "skipped-allowlist"
+    },
+    {
+      "key": "service-principal:000000cd-c0de-4c0d-9e00-0000000000cd",
+      "category": "service-principal",
+      "id": "000000cd-c0de-4c0d-9e00-0000000000cd",
+      "name": "Microsoft Intune PowerShell",
+      "action": "none",
+      "severity": "high",
+      "reasons": [
+        "application: Directory.ReadWrite.All",
+        "Microsoft first-party application"
+      ],
+      "permissions": [
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "Directory.ReadWrite.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        }
+      ],
+      "owners": [],
+      "details": {
+        "appId": "000023f5-c0de-4c0d-9e00-0000000023f5",
+        "servicePrincipalType": "Application",
+        "publisher": "Microsoft Services",
+        "verifiedPublisher": null,
+        "ownerTenantId": "f8cdef31-a31e-4b4a-93e4-5f571e91255a",
+        "homeTenant": false,
+        "createdDateTime": "2023-03-14T09:12:00Z",
+        "lastSignIn": null
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "not-applicable",
+      "error": null,
+      "revertOf": "skipped-allowlist"
+    },
+    {
+      "key": "sftp:/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontososftpprod",
+      "category": "sftp",
+      "id": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-data/providers/Microsoft.Storage/storageAccounts/stcontososftpprod",
+      "name": "stcontososftpprod",
+      "action": "disable-sftp",
+      "severity": "high",
+      "reasons": [
+        "SFTP endpoint enabled on storage account"
+      ],
+      "permissions": [],
+      "owners": [
+        {
+          "id": "00000003-c0de-4c0d-9e00-000000000003",
+          "displayName": "Megan Bowen",
+          "upn": "meganb@contoso.com",
+          "type": "user"
+        },
+        {
+          "displayName": "data-platform",
+          "type": "tag:owner"
+        }
+      ],
+      "details": {
+        "subscriptionName": "Contoso Production",
+        "subscriptionId": "2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
+        "resourceGroup": "rg-data",
+        "location": "westeurope",
+        "isLocalUserEnabled": true,
+        "publicNetworkAccess": "Enabled",
+        "localUsers": [
+          "fabrikam-upload",
+          "payroll-drop"
+        ],
+        "tags": {
+          "owner": "data-platform",
+          "costcenter": "CC-1042"
+        }
+      },
+      "before": {
+        "isSftpEnabled": true
+      },
+      "after": {
+        "isSftpEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "sftp:/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-partners/providers/Microsoft.Storage/storageAccounts/stpartnerexchange",
+      "category": "sftp",
+      "id": "/subscriptions/2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81/resourceGroups/rg-partners/providers/Microsoft.Storage/storageAccounts/stpartnerexchange",
+      "name": "stpartnerexchange",
+      "action": "disable-sftp",
+      "severity": "high",
+      "reasons": [
+        "SFTP endpoint enabled on storage account"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "subscriptionName": "Contoso Production",
+        "subscriptionId": "2b7e4c19-5a3d-4e8f-b1c6-9d0a2f4e6b81",
+        "resourceGroup": "rg-partners",
+        "location": "westeurope",
+        "isLocalUserEnabled": true,
+        "publicNetworkAccess": "Enabled",
+        "localUsers": [
+          "northwind"
+        ],
+        "tags": {}
+      },
+      "before": {
+        "isSftpEnabled": true
+      },
+      "after": {
+        "isSftpEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "sftp:/subscriptions/7c3f1e8a-2d4b-4a6c-9e1f-5b8d0c2a4e63/resourceGroups/rg-dev/providers/Microsoft.Storage/storageAccounts/stcontosodevsftp",
+      "category": "sftp",
+      "id": "/subscriptions/7c3f1e8a-2d4b-4a6c-9e1f-5b8d0c2a4e63/resourceGroups/rg-dev/providers/Microsoft.Storage/storageAccounts/stcontosodevsftp",
+      "name": "stcontosodevsftp",
+      "action": "disable-sftp",
+      "severity": "high",
+      "reasons": [
+        "SFTP endpoint enabled on storage account"
+      ],
+      "permissions": [],
+      "owners": [
+        {
+          "id": "00000005-c0de-4c0d-9e00-000000000005",
+          "displayName": "Lee Gu",
+          "upn": "leeg@contoso.com",
+          "type": "user"
+        },
+        {
+          "displayName": "leeg@contoso.com",
+          "type": "tag:createdBy"
+        }
+      ],
+      "details": {
+        "subscriptionName": "Contoso Dev",
+        "subscriptionId": "7c3f1e8a-2d4b-4a6c-9e1f-5b8d0c2a4e63",
+        "resourceGroup": "rg-dev",
+        "location": "northeurope",
+        "isLocalUserEnabled": false,
+        "publicNetworkAccess": "Disabled",
+        "localUsers": [],
+        "tags": {
+          "createdBy": "leeg@contoso.com"
+        }
+      },
+      "before": {
+        "isSftpEnabled": true
+      },
+      "after": {
+        "isSftpEnabled": false
+      },
+      "status": "reverted",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
+      "key": "conditional-access:0c1b5d2e-71aa-4e8f-9d3c-2b6f4a8e1c90",
+      "category": "conditional-access",
+      "id": "0c1b5d2e-71aa-4e8f-9d3c-2b6f4a8e1c90",
+      "name": "EXT - Block Fabrikam guests",
+      "action": "widen-to-all-external-tenants",
+      "severity": "critical",
+      "reasons": [
+        "Block sign-in for every guest / external user (all external tenants)"
+      ],
+      "permissions": [],
+      "owners": [],
+      "details": {
+        "currentState": {
+          "state": "enabled",
+          "conditions": {
+            "applications": {
+              "includeApplications": [
+                "All"
+              ],
+              "excludeApplications": []
+            },
+            "clientAppTypes": [
+              "all"
+            ],
+            "users": {
+              "includeUsers": [],
+              "excludeUsers": [
+                "00000001-c0de-4c0d-9e00-000000000001",
+                "00000002-c0de-4c0d-9e00-000000000002",
+                "00000003-c0de-4c0d-9e00-000000000003"
+              ],
+              "includeGroups": [],
+              "excludeGroups": [],
+              "includeRoles": [],
+              "excludeRoles": [],
+              "includeGuestsOrExternalUsers": {
+                "guestOrExternalUserTypes": "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider",
+                "externalTenants": {
+                  "@odata.type": "#microsoft.graph.conditionalAccessAllExternalTenants",
+                  "membershipKind": "all"
+                }
+              },
+              "excludeGuestsOrExternalUsers": null
+            }
+          }
+        },
+        "currentExternalTenants": {
+          "@odata.type": "#microsoft.graph.conditionalAccessEnumeratedExternalTenants",
+          "membershipKind": "enumerated",
+          "members": [
+            "5e2a9c41-7d3b-4f10-8a66-2c9e1b7d0f33"
+          ]
+        },
+        "excludedUsers": [
+          {
+            "id": "00000001-c0de-4c0d-9e00-000000000001",
+            "displayName": "Break Glass 01",
+            "upn": "bg-admin01@contoso.onmicrosoft.com",
+            "type": "user"
+          },
+          {
+            "id": "00000002-c0de-4c0d-9e00-000000000002",
+            "displayName": "Break Glass 02",
+            "upn": "bg-admin02@contoso.onmicrosoft.com",
+            "type": "user"
+          }
+        ],
+        "excludedGroups": [],
+        "grantControls": {
+          "operator": "OR",
+          "builtInControls": [
+            "block"
+          ]
+        },
+        "modifiedDateTime": "2026-10-20T17:34:06Z"
+      },
+      "before": {
+        "state": "enabled",
+        "conditions": {
+          "applications": {
+            "includeApplications": [
+              "All"
+            ],
+            "excludeApplications": []
+          },
+          "clientAppTypes": [
+            "all"
+          ],
+          "users": {
+            "includeUsers": [],
+            "excludeUsers": [
+              "00000001-c0de-4c0d-9e00-000000000001",
+              "00000002-c0de-4c0d-9e00-000000000002"
+            ],
+            "includeGroups": [],
+            "excludeGroups": [],
+            "includeRoles": [],
+            "excludeRoles": [],
+            "includeGuestsOrExternalUsers": {
+              "guestOrExternalUserTypes": "b2bCollaborationGuest,b2bCollaborationMember",
+              "externalTenants": {
+                "@odata.type": "#microsoft.graph.conditionalAccessEnumeratedExternalTenants",
+                "membershipKind": "enumerated",
+                "members": [
+                  "5e2a9c41-7d3b-4f10-8a66-2c9e1b7d0f33"
+                ]
+              }
+            },
+            "excludeGuestsOrExternalUsers": null
+          }
+        }
+      },
+      "after": {
+        "state": "enabled",
+        "conditions": {
+          "applications": {
+            "includeApplications": [
+              "All"
+            ],
+            "excludeApplications": []
+          },
+          "clientAppTypes": [
+            "all"
+          ],
+          "users": {
+            "includeUsers": [],
+            "excludeUsers": [
+              "00000001-c0de-4c0d-9e00-000000000001",
+              "00000002-c0de-4c0d-9e00-000000000002"
+            ],
+            "includeGroups": [],
+            "excludeGroups": [],
+            "includeRoles": [],
+            "excludeRoles": [],
+            "includeGuestsOrExternalUsers": {
+              "guestOrExternalUserTypes": "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider",
+              "externalTenants": {
+                "@odata.type": "#microsoft.graph.conditionalAccessAllExternalTenants",
+                "membershipKind": "all"
+              }
+            },
+            "excludeGuestsOrExternalUsers": null
+          }
+        }
+      },
+      "status": "drift",
+      "error": "Current state differs from what persiana set; use --force to overwrite",
+      "revertOf": "applied"
+    }
+  ],
+  "summary": {
+    "byCategory": {
+      "app-registration": 5,
+      "service-principal": 8,
+      "sftp": 3,
+      "conditional-access": 1
+    },
+    "byStatus": {
+      "not-applicable": 8,
+      "reverted": 7,
+      "skipped": 1,
+      "drift": 1
+    },
+    "bySeverity": {
+      "high": 12,
+      "medium": 2,
+      "critical": 3
+    },
+    "total": 17
+  }
+}
