@@ -98,11 +98,11 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
     "version": "0.1.0"
   },
   "run": {
-    "id": "b2979444-0af4-4745-bfca-880a24b58591",
+    "id": "929c3ce2-de88-4f2a-8163-9881f1683747",
     "mode": "rollback-dry-run",
     "status": "completed",
-    "startedAt": "2026-11-11T15:39:47+00:00",
-    "finishedAt": "2026-11-11T15:39:47+00:00",
+    "startedAt": "2026-11-16T15:30:19+00:00",
+    "finishedAt": "2026-11-16T15:30:19+00:00",
     "operator": {
       "kind": "user",
       "id": "00000006-c0de-4c0d-9e00-000000000006",
@@ -110,8 +110,8 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
       "appId": null
     },
     "tenantId": "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
-    "configSha256": "9939ce813c995638ddb04fd8901dea3723d6a511d0daa07c3ac6c60f70e0cc2f",
-    "sourceRunId": "52ee347e-b2cf-4b0c-b211-c6a9780252b3"
+    "configSha256": "4ac5bfd59a0e4bded4ad96b36494f03cff30f6f7c7b7e47f2e21f662206fa4fd",
+    "sourceRunId": "30fda8f5-74c0-446d-bcef-b7213a5c2ad9"
   },
   "preflight": {
     "ok": true,
@@ -683,6 +683,59 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
       "revertOf": "skipped-allowlist"
     },
     {
+      "key": "service-principal:000000c9-c0de-4c0d-9e00-0000000000c9",
+      "category": "service-principal",
+      "id": "000000c9-c0de-4c0d-9e00-0000000000c9",
+      "name": "Legacy Backup Tool",
+      "action": "disable-service-principal",
+      "severity": "high",
+      "reasons": [
+        "application: Files.ReadWrite.All",
+        "application: Mail.ReadWrite",
+        "application: Sites.FullControl.All"
+      ],
+      "permissions": [
+        {
+          "type": "application",
+          "resource": "Office 365 SharePoint Online",
+          "value": "Sites.FullControl.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        },
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "Mail.ReadWrite",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        },
+        {
+          "type": "application",
+          "resource": "Microsoft Graph",
+          "value": "Files.ReadWrite.All",
+          "grantedAt": "2024-05-01T10:00:00Z"
+        }
+      ],
+      "owners": [],
+      "details": {
+        "appId": "000023f1-c0de-4c0d-9e00-0000000023f1",
+        "servicePrincipalType": "Application",
+        "publisher": "Northwind Traders",
+        "verifiedPublisher": null,
+        "ownerTenantId": "a7d1e3f5-9b2c-4d6e-8f0a-1c3e5a7b9d2f",
+        "homeTenant": false,
+        "createdDateTime": "2019-11-20T16:45:00Z",
+        "lastSignIn": "2026-11-10T23:41:00Z"
+      },
+      "before": {
+        "accountEnabled": true
+      },
+      "after": {
+        "accountEnabled": false
+      },
+      "status": "planned",
+      "error": null,
+      "revertOf": "applied"
+    },
+    {
       "key": "service-principal:000000c8-c0de-4c0d-9e00-0000000000c8",
       "category": "service-principal",
       "id": "000000c8-c0de-4c0d-9e00-0000000000c8",
@@ -730,59 +783,6 @@ button.theme{background:none;border:1px solid currentColor;color:inherit;border-
         "homeTenant": true,
         "createdDateTime": "2022-06-01T10:00:00Z",
         "lastSignIn": "2026-11-11T06:02:00Z"
-      },
-      "before": {
-        "accountEnabled": true
-      },
-      "after": {
-        "accountEnabled": false
-      },
-      "status": "planned",
-      "error": null,
-      "revertOf": "applied"
-    },
-    {
-      "key": "service-principal:000000c9-c0de-4c0d-9e00-0000000000c9",
-      "category": "service-principal",
-      "id": "000000c9-c0de-4c0d-9e00-0000000000c9",
-      "name": "Legacy Backup Tool",
-      "action": "disable-service-principal",
-      "severity": "high",
-      "reasons": [
-        "application: Files.ReadWrite.All",
-        "application: Mail.ReadWrite",
-        "application: Sites.FullControl.All"
-      ],
-      "permissions": [
-        {
-          "type": "application",
-          "resource": "Microsoft Graph",
-          "value": "Mail.ReadWrite",
-          "grantedAt": "2024-05-01T10:00:00Z"
-        },
-        {
-          "type": "application",
-          "resource": "Microsoft Graph",
-          "value": "Files.ReadWrite.All",
-          "grantedAt": "2024-05-01T10:00:00Z"
-        },
-        {
-          "type": "application",
-          "resource": "Office 365 SharePoint Online",
-          "value": "Sites.FullControl.All",
-          "grantedAt": "2024-05-01T10:00:00Z"
-        }
-      ],
-      "owners": [],
-      "details": {
-        "appId": "000023f1-c0de-4c0d-9e00-0000000023f1",
-        "servicePrincipalType": "Application",
-        "publisher": "Northwind Traders",
-        "verifiedPublisher": null,
-        "ownerTenantId": "a7d1e3f5-9b2c-4d6e-8f0a-1c3e5a7b9d2f",
-        "homeTenant": false,
-        "createdDateTime": "2019-11-20T16:45:00Z",
-        "lastSignIn": "2026-11-10T23:41:00Z"
       },
       "before": {
         "accountEnabled": true

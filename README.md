@@ -28,7 +28,7 @@ You choose what to contain with switches; everything is dry-run until you add `-
 
 Lists take object IDs (preferred), names, comma-separated values or `@file.txt` (one per line). Unknown or ambiguous names stop the run. Running with no switch at all is an error: there is no implicit "disable everything".
 
-"Tenant-wide" permissions for apps: dangerous application permissions on Graph, Exchange or SharePoint; delegated consent for all users; Entra directory roles; Azure RBAC Owner, Contributor or UAA on a subscription, management group or `/`. The exact list is in [`shutter.toml`](shutter.toml).
+"Tenant-wide" permissions for apps: dangerous application permissions on Graph, Exchange or SharePoint; delegated consent for all users; Entra directory roles; Azure RBAC Owner, Contributor or UAA on a subscription, management group or `/`. The exact list is in [`shutter.example.toml`](shutter.example.toml).
 
 ## Safety guarantees
 
@@ -48,6 +48,14 @@ Lists take object IDs (preferred), names, comma-separated values or `@file.txt` 
 ## Usage
 
 Requirements: Python ≥ 3.11 (stdlib only) and `az login` with the roles **active** in PIM. See [docs/permissions.md](docs/permissions.md).
+
+> **Azure public cloud only.** The Graph, ARM and Storage endpoints are fixed to the global cloud (`graph.microsoft.com`, `management.azure.com`, `*.blob.core.windows.net`). Sovereign clouds (Azure Government, Azure China) are not supported.
+
+Create your configuration from the template (`shutter.toml` is git-ignored) and fill in your tenant ID, Conditional Access policy IDs and break-glass accounts:
+
+```bash
+cp shutter.example.toml shutter.toml
+```
 
 Plan a lockdown of guests and all storage (dry-run, writes `reports/<date>-dry-run/`):
 
@@ -97,7 +105,7 @@ Other options and commands:
 - `shutter approve <dry-run report.json>`: second operator approval.
 - `shutter unlock`: break a stale lock.
 
-Configuration sections in `shutter.toml`: `[conditional_access]` (guest policy, static group), `[groups]` (block policy), `[aks]` (SOC IP ranges), `[allowlist]`, `[break_glass]`, `[control]`, `[approval]` and `[[notify]]`. See the commented examples in the file and [docs/design.md](docs/design.md).
+Configuration sections in `shutter.toml` (see [`shutter.example.toml`](shutter.example.toml)): `[conditional_access]` (guest policy, static group), `[groups]` (block policy), `[aks]` (SOC IP ranges), `[allowlist]`, `[break_glass]`, `[control]`, `[approval]` and `[[notify]]`. See the commented examples in the file and [docs/design.md](docs/design.md).
 
 Each run produces:
 - **`report.json`**: the source of truth. It stores the `before`/`after` state of every object and is the input for rollback. **Keep it safe**: without it there is no automatic rollback.
@@ -136,3 +144,7 @@ python3 -m unittest discover -s tests
 - [docs/ROADMAP.md](docs/ROADMAP.md): planned features and known gaps.
 
 > ⚠️ **Status:** never run against a real tenant. Pending validation in a test tenant.
+
+## License
+
+[MIT](LICENSE)

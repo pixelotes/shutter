@@ -5,11 +5,11 @@
     "version": "0.1.0"
   },
   "run": {
-    "id": "346c7582-af50-44fa-9dee-177c81a61b21",
+    "id": "4daefb59-a347-41cf-b4e7-9fb4da71748c",
     "mode": "dry-run",
     "status": "completed",
-    "startedAt": "2026-11-11T15:39:47+00:00",
-    "finishedAt": "2026-11-11T15:39:47+00:00",
+    "startedAt": "2026-11-16T15:30:19+00:00",
+    "finishedAt": "2026-11-16T15:30:19+00:00",
     "operator": {
       "kind": "user",
       "id": "00000006-c0de-4c0d-9e00-000000000006",
@@ -17,7 +17,7 @@
       "appId": null
     },
     "tenantId": "8f3c1d2e-4b5a-4c6d-9e8f-0a1b2c3d4e5f",
-    "configSha256": "9939ce813c995638ddb04fd8901dea3723d6a511d0daa07c3ac6c60f70e0cc2f",
+    "configSha256": "4ac5bfd59a0e4bded4ad96b36494f03cff30f6f7c7b7e47f2e21f662206fa4fd",
     "selection": {
       "disable_guests": [
         "acme.com",

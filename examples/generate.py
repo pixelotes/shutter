@@ -34,7 +34,7 @@ FULL = [
 
 
 def contoso_config() -> Path:
-    cfg = (ROOT / "shutter.toml").read_text()
+    cfg = (ROOT / "shutter.example.toml").read_text()
     cfg = re.sub(r'tenant_id = ".*"', f'tenant_id = "{fake_tenant.TENANT}"', cfg)
     cfg = re.sub(r'^policy_id = ".*?"[^\n]*', f'policy_id = "{fake_tenant.CA_ID}"   # "EXT - Block Fabrikam guests"', cfg, flags=re.M)
     cfg = cfg.replace('# static_group_id = "<group-object-id>"', f'static_group_id = "{fake_tenant.GUEST_GROUP}"')
